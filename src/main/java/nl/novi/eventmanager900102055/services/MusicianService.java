@@ -18,24 +18,58 @@ public class MusicianService {
     }
 
     public List<MusicianDto> getAllMusicians() {
+        List<Musician> musicianList = musicianRepository.findAll();
+        return transferMusicianListToMusicianDtoList(musicianList);
+    }
+
+    public List<MusicianDto> getMusicianByLastName(String lastname) {
+        Iterable<Musician> iterableMusicians = musicianRepository.findByLastName(lastname);
+        ArrayList<Musician> musicianList = new ArrayList<>();
+
+        for (Musician musician : iterableMusicians) {
+            musicianList.add(musician);
+        }
+
+        return transferMusicianListToMusicianDtoList(musicianList);
+    }
+
+    public MusicianDto addMusician(MusicianDto musicianDto) {
+        Musician musician = transferToMusician(musicianDto);
+        musicianRepository.save(musician);
+
+        return transferToMusicianDto(musician);
+    }
+
+    public List<MusicianDto> transferMusicianListToMusicianDtoList(List<Musician> musicianList){
         List<MusicianDto> musicianDtoList = new ArrayList<>();
-        Iterable<Musician> musicianList = musicianRepository.findAll();
 
         for(Musician m : musicianList) {
-            MusicianDto dto = transferToDto(m);
-            musicianDtoList.add(dto);
+            MusicianDto musicianDto = new MusicianDto();
+            musicianDto.id = m.getId();
+            musicianDto.firstName = m.getFirstName();
+            musicianDto.lastName = m.getLastName();
+            musicianDtoList.add(musicianDto);
         }
         return musicianDtoList;
     }
 
-    public MusicianDto transferToDto(Musician musician){
-        var dto = new MusicianDto();
+    public Musician transferToMusician(MusicianDto musicianDto){
+        Musician musician = new Musician();
+        musician.setId(musicianDto.id);
+        musician.setFirstName(musicianDto.firstName);
+        musician.setLastName(musicianDto.lastName);
 
-        dto.setId(musician.getId());
-        dto.setFirstName(musician.getFirstName());
-        dto.setLastName(musician.getLastName());
+        return musician;
+    }
 
-        return dto;
+    public MusicianDto transferToMusicianDto(Musician musician){
+        MusicianDto musicianDto = new MusicianDto();
+
+        musicianDto.id = musician.getId();
+        musicianDto.firstName = musician.getFirstName();
+        musicianDto.lastName = musician.getLastName();
+
+        return musicianDto;
     }
 
 }

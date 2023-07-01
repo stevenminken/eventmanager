@@ -1,18 +1,28 @@
 package nl.novi.eventmanager900102055.models;
 
 import jakarta.persistence.*;
+import org.springframework.boot.autoconfigure.web.WebProperties;
 
 @Entity
 @Table(name="musicians")
 public class Musician {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String firstName;
 
     private String lastName;
+
+//    @ManyToOne  voor kardinaliteit
+//    private Teacher teacher;
+
+//    ander kant:
+//    @OneToMany(mappedBy = "teacher")  veld in ander opject
+//    private List<Course courses>
+//    IN CourseDto ook veld teacherId;
+
 
     public Musician() {}
     public Musician(String firstName, String lastName) {
