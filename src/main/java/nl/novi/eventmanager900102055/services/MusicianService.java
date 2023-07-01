@@ -40,6 +40,14 @@ public class MusicianService {
         return transferToMusicianDto(musician);
     }
 
+    public boolean deleteMusician(Long id) {
+        if(musicianRepository.existsById(id)) {
+            musicianRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
+
     public List<MusicianDto> transferMusicianListToMusicianDtoList(List<Musician> musicianList){
         List<MusicianDto> musicianDtoList = new ArrayList<>();
 

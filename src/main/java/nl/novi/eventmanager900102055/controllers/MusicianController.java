@@ -1,13 +1,9 @@
 package nl.novi.eventmanager900102055.controllers;
 
 import nl.novi.eventmanager900102055.dtos.MusicianDto;
-import nl.novi.eventmanager900102055.models.Musician;
-import nl.novi.eventmanager900102055.repositories.MusicianRepository;
 import nl.novi.eventmanager900102055.services.MusicianService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -19,7 +15,7 @@ public class MusicianController {
 
     private final MusicianService MusicianService;
 
-    public MusicianController(MusicianService MusicianService){
+    public MusicianController(MusicianService MusicianService) {
         this.MusicianService = MusicianService;
 
     }
@@ -46,6 +42,16 @@ public class MusicianController {
                 .buildAndExpand(dto.lastName)
                 .toUri();
 
-        return ResponseEntity.created(location).body(dto);  }
+        return ResponseEntity.created(location).body(dto);
+    }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> deleteMusician(@PathVariable("id") Long id) {
+        boolean deleted = MusicianService.deleteMusician(id);
+        if (deleted) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.badRequest().body("The id you are trying to delete does not exist.");
+        }
+    }
 }
