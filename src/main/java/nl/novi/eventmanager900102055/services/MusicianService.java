@@ -1,6 +1,8 @@
 package nl.novi.eventmanager900102055.services;
 
 import nl.novi.eventmanager900102055.dtos.MusicianDto;
+import nl.novi.eventmanager900102055.exceptions.NameDuplicateException;
+import nl.novi.eventmanager900102055.exceptions.ResourceNotFoundException;
 import nl.novi.eventmanager900102055.models.Musician;
 import nl.novi.eventmanager900102055.repositories.MusicianRepository;
 import org.springframework.stereotype.Service;
@@ -22,8 +24,11 @@ public class MusicianService {
         return transferMusicianListToMusicianDtoList(musicianList);
     }
 
-    public List<MusicianDto> getMusicianByLastName(String lastname) {
+    public List<MusicianDto> getMusicianByLastName(String lastname) throws ResourceNotFoundException {
         Iterable<Musician> iterableMusicians = musicianRepository.findByLastName(lastname);
+        if(iterableMusicians == null) {
+            throw new ResourceNotFoundException("Can't find this musician");
+        }
         ArrayList<Musician> musicianList = new ArrayList<>();
 
         for (Musician musician : iterableMusicians) {
@@ -33,7 +38,13 @@ public class MusicianService {
         return transferMusicianListToMusicianDtoList(musicianList);
     }
 
-    public MusicianDto addMusician(MusicianDto musicianDto) {
+    public MusicianDto addMusician(MusicianDto musicianDto) throws NameDuplicateException {
+        Iterable<Musician> allMusicians = musicianRepository.findAll();
+        for (Musician m: allMusicians) {
+            if (m.getLastName().equals(musicianDto.lastName)) {
+                throw new NameDuplicateException("This Musician already exists");
+            }
+        }
         Musician musician = transferToMusician(musicianDto);
         musicianRepository.save(musician);
 
@@ -46,6 +57,10 @@ public class MusicianService {
             return true;
         }
         return false;
+//        if(repos == null){throw new RecourceNotFoundException("...")}
+//
+//
+
     }
 
     public List<MusicianDto> transferMusicianListToMusicianDtoList(List<Musician> musicianList){
