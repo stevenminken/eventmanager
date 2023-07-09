@@ -54,7 +54,7 @@ public class EventService {
     }
     public EventDto createEvent(EventDto eventDto){return new EventDto();};
 
-                                public EventDto createEvent(EventDto eventDto, long userId, List<Long> artistIds) throws NameDuplicateException {
+        public EventDto createEvent(EventDto eventDto, long userId, List<Long> artistIds) throws NameDuplicateException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 

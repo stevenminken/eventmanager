@@ -30,7 +30,7 @@ public class ArtistService {
         return transferArtistListToArtistDtoList(artistList);
     }
 
-    public ArtistDto createArtist(ArtistDto artistDto, long userId, List<Long> eventIds) throws NameDuplicateException {
+    public ArtistDto createArtist(ArtistDto artistDto, long userId) throws NameDuplicateException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
@@ -42,41 +42,32 @@ public class ArtistService {
         }
         Artist artist = transferArtistDtoToArtist(artistDto);
 
-        List<Event> events = eventRepository.findAllById(eventIds);
-        artist.setEvents(events);
-        for (Event event : events) {
-            event.getArtists().add(artist);
-        }
+//        List<Event> events = eventRepository.findAllById(eventIds);
+//        artist.setEvents(events);
+//        for (Event event : events) {
+//            event.getArtists().add(artist);
+//        }
 
         artist.setUser(user);
         user.getArtistList().add(artist);
 
         userRepository.save(user);
         artist = artistRepository.save(artist);
-
         return transferArtistToArtistDto(artist);
     }
 
     public ArtistDto findArtistById(Long id) {
-        Artist artist = artistRepository.findById(id).orElse(null);
-        if (artist == null) {
-            return null;
-        }
+        Artist artist = artistRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Artist not found"));
         return transferArtistToArtistDto(artist);
     }
 
-    public List<ArtistDto> getArtistByName(String name) throws ResourceNotFoundException {
-        Iterable<Artist> iterableArtists = artistRepository.findByName(name);
-        if (iterableArtists == null) {
-            throw new ResourceNotFoundException("Can't find this artist");
+    public ArtistDto findArtistByName(String name) throws ResourceNotFoundException {
+        Artist artist  = artistRepository.findByName(name);
+        if (artist == null) {
+            throw new ResourceNotFoundException("Artist not found");
         }
-        ArrayList<Artist> artistList = new ArrayList<>();
-
-        for (Artist artist : iterableArtists) {
-            artistList.add(artist);
-        }
-
-        return transferArtistListToArtistDtoList(artistList);
+        return transferArtistToArtistDto(artist);
     }
 
     public ArtistDto updateArtist(Long id, ArtistDto artistDto) {
@@ -86,7 +77,7 @@ public class ArtistService {
         }
         artist.setName(artistDto.getName());
         artist.setGenre(artistDto.getGenre());
-        ;
+
         return transferArtistToArtistDto(artistRepository.save(artist));
     }
 

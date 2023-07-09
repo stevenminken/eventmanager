@@ -16,7 +16,7 @@ public class User {
     private String name;
     private String email;
     private String address;
-    private String phoneNumber;
+    private String phonenumber;
     @OneToMany(mappedBy = "user")
     private List<Event> eventList;
     @OneToMany(mappedBy = "user")
@@ -44,13 +44,13 @@ public class User {
 
 
 
-    public User(String username, String password, String name, String email, String address, String phoneNumber) {
+    public User(String username, String password, String name, String email, String address, String phonenumber) {
         this.username = username;
         this.password = password;
         this.name = name;
         this.email = email;
         this.address = address;
-        this.phoneNumber = phoneNumber;
+        this.phonenumber = phonenumber;
     }
 
     public Long getId() {
@@ -102,11 +102,11 @@ public class User {
     }
 
     public String getPhoneNumber() {
-        return phoneNumber;
+        return phonenumber;
     }
 
     public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+        this.phonenumber = phonenumber;
     }
 
     public List<Event> getEventList() {

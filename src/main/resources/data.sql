@@ -1,1 +1,3 @@
-INSERT INTO artists (name, genre) VALUES ('jan', 'janssen'),('Piet','Pieters');
+INSERT INTO artists (name, genre) VALUES ('jan', 'rock'),('Piet','rap');
+INSERT INTO users (username, password, name, email, address, phoneNumber) VALUES ('beheerder', '1234', 'Joris','joris@holland.nl', 'beheerderstraat 7', '0123456789');
+INSERT INTO users (username, password, name, email, address, phoneNumber) VALUES ('klant', '56678', 'Bernard','bernard@holland.nl', 'klantstraat 3', '0987654321');

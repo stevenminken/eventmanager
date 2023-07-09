@@ -6,7 +6,6 @@ import java.util.ArrayList;
 
 @Entity
 @Table(name = "securities")
-
 public class Security {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

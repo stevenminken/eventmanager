@@ -25,8 +25,8 @@ public class UserService {
 
     public UserDto createUser(UserDto userDto) throws NameDuplicateException {
         Iterable<User> allUsers = userRepository.findAll();
-        for (User e: allUsers) {
-            if (e.getName().equals(userDto.getName())) {
+        for (User u: allUsers) {
+            if (u.getName().equals(userDto.getName())) {
                 throw new NameDuplicateException("This User already exists");
             }
         }

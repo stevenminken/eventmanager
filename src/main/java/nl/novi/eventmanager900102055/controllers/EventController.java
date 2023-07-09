@@ -15,6 +15,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
+@RestController
+@RequestMapping("/events")
 public class EventController {
     private final EventService eventService;
 
