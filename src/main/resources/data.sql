@@ -1,1 +1,1 @@
-INSERT INTO musicians (first_name, last_name) VALUES ('jan', 'janssen'),('Piet','Pieters');
+INSERT INTO artists (name, genre) VALUES ('jan', 'janssen'),('Piet','Pieters');

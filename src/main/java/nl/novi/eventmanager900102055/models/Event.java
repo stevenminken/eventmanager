@@ -25,6 +25,8 @@ public class Event {
     private User user;
     @OneToMany(mappedBy = "event")
     private List<Ticket> ticketList;
+    @ManyToMany(mappedBy = "events")
+    private List<Artist> artists;
 
     public Event() {
     }
@@ -106,6 +108,13 @@ public class Event {
 
     public void setTicketList(List<Ticket> ticketList) {
         this.ticketList = ticketList;
+    }
+    public List<Artist> getArtists() {
+        return artists;
+    }
+
+    public void setArtists(List<Artist> artists) {
+        this.artists = artists;
     }
 
     public String getDetails() {

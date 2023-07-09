@@ -21,7 +21,9 @@ public class Ticket {
     public Ticket() {
     }
 
-    public Ticket(Double price) {
+    public Ticket(User user, Event event, Double price) {
+        this.user = user;
+        this.event = event;
         this.price = price;
     }
 

@@ -17,7 +17,7 @@ public class Location {
     @ManyToOne
     private User user;
     @ManyToMany(mappedBy = "locationList")
-    private List<Event> events;
+    private List<Event> eventList;
 
     public Location() {
     }
@@ -28,6 +28,8 @@ public class Location {
         this.email = email;
         this.numberOfSeats = numberOfSeats;
     }
+
+
 
     public Long getId() {
         return id;
@@ -77,12 +79,12 @@ public class Location {
         this.user = user;
     }
 
-    public List<Event> getEvents() {
-        return events;
+    public List<Event> getEventList() {
+        return eventList;
     }
 
-    public void setEvents(List<Event> events) {
-        this.events = events;
+    public void setEvents(List<Event> eventList) {
+        this.eventList = eventList;
     }
 
     public String getDetails() {

@@ -22,12 +22,27 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Ticket> ticketList;
     @OneToMany(mappedBy = "user")
-    private List<Ticket> locationList;
+    private List<Location> locationList;
     @OneToMany(mappedBy = "user")
     private List<Artist> artistList;
 
     public User() {
     }
+//    buyTickets()
+//    downloadTickets();
+//    addEvent()
+//        editEvent()
+//            removeEvent()
+//                addArtist()
+//                    editArtist()
+//                        removeArtist()
+//                            addLocation()
+//                                editLocation()
+//                                    removeLocation()
+//                                        viewStatistics()
+//                                            uploadContract()
+
+
 
     public User(String username, String password, String name, String email, String address, String phoneNumber) {
         this.username = username;
@@ -110,11 +125,11 @@ public class User {
         this.ticketList = ticketList;
     }
 
-    public List<Ticket> getLocationList() {
+    public List<Location> getLocationList() {
         return locationList;
     }
 
-    public void setLocationList(List<Ticket> locationList) {
+    public void setLocationList(List<Location> locationList) {
         this.locationList = locationList;
     }
 
