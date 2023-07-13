@@ -5,6 +5,7 @@ import nl.novi.eventmanager900102055.dtos.EventDto;
 import nl.novi.eventmanager900102055.exceptions.NameDuplicateException;
 import nl.novi.eventmanager900102055.exceptions.ResourceNotFoundException;
 import nl.novi.eventmanager900102055.services.EventService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -14,6 +15,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/events")
@@ -25,57 +27,59 @@ public class EventController {
         this.eventService = eventService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<EventDto>> findAllEvents() {
-        List<EventDto> eventDtoList;
-        eventDtoList = eventService.findAllEvents();
-        return ResponseEntity.ok().body(eventDtoList);
-    }
+    @PostMapping("/{username}")
+    public ResponseEntity<Object> createEvent(@Valid @RequestBody EventDto EventDto, BindingResult bindingResult, @PathVariable("username") String username) throws NameDuplicateException, ResourceNotFoundException {
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Object> findEventById(@PathVariable("id") Long id) {
-        try {
-            EventDto eventDto = eventService.findEventById(id);
-            return ResponseEntity.ok().body(eventDto);
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        if (bindingResult.hasFieldErrors()) {
+            StringBuilder sb = new StringBuilder();
+            for (FieldError fe : bindingResult.getFieldErrors()) {
+                sb.append(fe.getField()).append(": ");
+                sb.append(fe.getDefaultMessage());
+                sb.append("\n");
+            }
+            return ResponseEntity.badRequest().body(sb.toString());
+        } else {
+            EventDto dto = eventService.createEvent(EventDto, username);
+            URI location = UriComponentsBuilder
+                    .fromPath("/Events/{lastName}")
+                    .buildAndExpand(dto.getName())
+                    .toUri();
+
+            return ResponseEntity.created(location).body("Event created: " + dto.getName() + " with id: " + +dto.getId());
         }
     }
 
-    @GetMapping("/name")
-    public ResponseEntity<List<EventDto>> getEventByLastName(@RequestParam String name) {
+    @GetMapping
+    public ResponseEntity<List<EventDto>> findAllEvents() {
+        List<EventDto> EventDtoList;
+        EventDtoList = eventService.findAllEvents();
+        return ResponseEntity.ok().body(EventDtoList);
+    }
+
+    @GetMapping(params = "id")
+    public ResponseEntity<Object> findEventById(@RequestParam("id") Long id) {
         try {
-            List<EventDto> eventDtoList = eventService.getEventByName(name);
-            return ResponseEntity.ok().body(eventDtoList);
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.notFound().build();
+            EventDto EventDto = eventService.findEventById(id);
+            return ResponseEntity.ok().body(EventDto);
+        } catch (Exception e) {
+            String errorMessage = "Error occurred while fetching the Event: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
         }
     }
 
     @PostMapping
-    public ResponseEntity<Object> addEvent(@Valid @RequestBody EventDto eventDto, BindingResult br) throws NameDuplicateException {
-        if (br.hasFieldErrors()) {
-            StringBuilder sb = new StringBuilder();
-            for (FieldError fe : br.getFieldErrors()) {
-                sb.append("https://");
-                sb.append(fe.getField()).append(": ");
-                sb.append(fe.getDefaultMessage());
-                sb.append("/n");
-            }
-            return ResponseEntity.badRequest().body(sb.toString());
-        } else {
-            EventDto dto = eventService.createEvent(eventDto);
-            URI location = UriComponentsBuilder
-                    .fromPath("/events/{lastName}")
-                    .buildAndExpand(dto.getName())
-                    .toUri();
-
-            return ResponseEntity.created(location).body("Event created " + dto);
+    public ResponseEntity<Object> findEventByName(@RequestBody Map<String, Object> requestBody) {
+        try {
+            EventDto EventDto = eventService.findEventByName(requestBody.get("name").toString());
+            return ResponseEntity.ok().body(EventDto);
+        } catch (Exception e) {
+            String errorMessage = "Error occurred while fetching the Event: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateEvent(@PathVariable("id") Long id, @Valid @RequestBody EventDto eventDto, BindingResult br) {
+    public ResponseEntity<Object> updateEvent(@PathVariable("id") Long id, @Valid @RequestBody EventDto EventDto, BindingResult br) {
         if (br.hasFieldErrors()) {
             StringBuilder sb = new StringBuilder();
             for (FieldError fe : br.getFieldErrors()) {
@@ -85,21 +89,18 @@ public class EventController {
             }
             return ResponseEntity.badRequest().body(sb.toString());
         } else {
-            try {
-                EventDto updatedEventDto = eventService.updateEvent(id, eventDto);
-                return ResponseEntity.ok().body(updatedEventDto);
-            } catch (ResourceNotFoundException e) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-            }
+            EventDto updatedEventDto = eventService.updateEvent(id, EventDto);
+            return ResponseEntity.ok().body(updatedEventDto);
         }
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteEvent(@PathVariable("id") Long id) {
-        try {
-            eventService.deleteEvent(id);
-            return ResponseEntity.noContent().build();
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        boolean deleted = eventService.deleteEvent(id);
+        if (deleted) {
+            return ResponseEntity.ok().body("Event deleted");
+        } else {
+            return ResponseEntity.badRequest().body("Event not deleted");
         }
     }
 

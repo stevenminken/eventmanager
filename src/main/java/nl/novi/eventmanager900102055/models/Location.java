@@ -13,10 +13,12 @@ public class Location {
     private String name;
     private String address;
     private String email;
+    @Column(name = "number_of_seats")
     private Integer numberOfSeats;
     @ManyToOne
     private User user;
     @ManyToMany(mappedBy = "locationList")
+    @Column(name = "event_list")
     private List<Event> eventList;
 
     public Location() {

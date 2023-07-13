@@ -1,12 +1,19 @@
 package nl.novi.eventmanager900102055.dtos;
 
+import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDate;
 import java.util.Date;
 
 public class EventDto {
     private Long id;
+    @NotNull
     private String name;
-    private Date date;
+    @NotNull
+    private LocalDate date;
+    @NotNull
     private Integer availability;
+    @NotNull
     private Integer ticketsSold;
 
     public EventDto() {
@@ -28,11 +35,11 @@ public class EventDto {
         this.name = name;
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

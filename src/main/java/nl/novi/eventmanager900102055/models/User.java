@@ -2,64 +2,49 @@ package nl.novi.eventmanager900102055.models;
 
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
 public class User {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(nullable = false, unique = true)
     private String username;
+
+    @Column(nullable = false, length = 255)
     private String password;
-    private String name;
+
+    @Column(nullable = false)
+    private boolean enabled = true;
+
+    @Column
+    private String apikey;
+
+    @Column
     private String email;
-    private String address;
-    private String phonenumber;
+
+    @OneToMany(
+            targetEntity = Authority.class,
+            mappedBy = "username",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.EAGER)
+    private Set<Authority> authorities = new HashSet<>();
     @OneToMany(mappedBy = "user")
+    @Column(name = "event_list")
     private List<Event> eventList;
     @OneToMany(mappedBy = "user")
+    @Column(name = "ticket_list")
     private List<Ticket> ticketList;
     @OneToMany(mappedBy = "user")
+    @Column(name = "location_list")
     private List<Location> locationList;
     @OneToMany(mappedBy = "user")
+    @Column(name = "artist_list")
     private List<Artist> artistList;
-
-    public User() {
-    }
-//    buyTickets()
-//    downloadTickets();
-//    addEvent()
-//        editEvent()
-//            removeEvent()
-//                addArtist()
-//                    editArtist()
-//                        removeArtist()
-//                            addLocation()
-//                                editLocation()
-//                                    removeLocation()
-//                                        viewStatistics()
-//                                            uploadContract()
-
-
-
-    public User(String username, String password, String name, String email, String address, String phonenumber) {
-        this.username = username;
-        this.password = password;
-        this.name = name;
-        this.email = email;
-        this.address = address;
-        this.phonenumber = phonenumber;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getUsername() {
         return username;
@@ -77,12 +62,20 @@ public class User {
         this.password = password;
     }
 
-    public String getName() {
-        return name;
+    public boolean isEnabled() {
+        return enabled;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public String getApikey() {
+        return apikey;
+    }
+
+    public void setApikey(String apikey) {
+        this.apikey = apikey;
     }
 
     public String getEmail() {
@@ -93,20 +86,16 @@ public class User {
         this.email = email;
     }
 
-    public String getAddress() {
-        return address;
+    public Set<Authority> getAuthorities() {
+        return authorities;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void addAuthority(Authority authority) {
+        this.authorities.add(authority);
     }
 
-    public String getPhoneNumber() {
-        return phonenumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phonenumber = phonenumber;
+    public void removeAuthority(Authority authority) {
+        this.authorities.remove(authority);
     }
 
     public List<Event> getEventList() {
@@ -139,9 +128,5 @@ public class User {
 
     public void setArtistList(List<Artist> artistList) {
         this.artistList = artistList;
-    }
-
-    public String getDetails() {
-        return "details";
     }
 }

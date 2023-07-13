@@ -2,7 +2,7 @@ package nl.novi.eventmanager900102055.models;
 
 import jakarta.persistence.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "transactions")
@@ -10,7 +10,9 @@ public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Date dateOfPurchase;
+    @Column(name = "date_of_purchase")
+    private LocalDate dateOfPurchase;
+    @JoinColumn(name = "payment_method")
     private String paymentMethod;
     @OneToOne
     private Ticket ticket;
@@ -18,7 +20,7 @@ public class Transaction {
     public Transaction() {
     }
 
-    public Transaction(Date dateOfPurchase, String paymentMethod) {
+    public Transaction(LocalDate dateOfPurchase, String paymentMethod) {
         this.dateOfPurchase = dateOfPurchase;
         this.paymentMethod = paymentMethod;
     }
@@ -31,11 +33,11 @@ public class Transaction {
         this.id = id;
     }
 
-    public Date getDateOfPurchase() {
+    public LocalDate getDateOfPurchase() {
         return dateOfPurchase;
     }
 
-    public void setDateOfPurchase(Date dateOfPurchase) {
+    public void setDateOfPurchase(LocalDate dateOfPurchase) {
         this.dateOfPurchase = dateOfPurchase;
     }
 

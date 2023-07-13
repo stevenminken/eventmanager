@@ -1,7 +1,9 @@
 package nl.novi.eventmanager900102055.services;
 
+import nl.novi.eventmanager900102055.dtos.EventDto;
 import nl.novi.eventmanager900102055.dtos.TicketDto;
 import nl.novi.eventmanager900102055.exceptions.NameDuplicateException;
+import nl.novi.eventmanager900102055.exceptions.ResourceNotFoundException;
 import nl.novi.eventmanager900102055.models.Event;
 import nl.novi.eventmanager900102055.models.Ticket;
 import nl.novi.eventmanager900102055.models.Transaction;
@@ -12,6 +14,7 @@ import nl.novi.eventmanager900102055.repositories.TransactionRepository;
 import nl.novi.eventmanager900102055.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,21 +32,20 @@ public class TicketService {
         this.transactionRepository = transactionRepository;
     }
 
-    public List<TicketDto> findAllTickets() {
-        List<Ticket> ticketList = ticketRepository.findAll();
-        return transferTicketListToTicketDtoList(ticketList);
-    }
+    public TicketDto createTicket(Long eventId, String username, Double price) throws ResourceNotFoundException {
+        User user = userRepository.findById(username).orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
 
-    public TicketDto buyTicket(long eventId, long userId, Double price) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new IllegalArgumentException("Event not found"));
 
         Ticket ticket = new Ticket(user, event, price);
 
         Transaction transaction = new Transaction();
+        transaction.setDateOfPurchase(LocalDate.now());
+        transaction.setPaymentMethod("creditcard");
         transaction.setTicket(ticket);
+//        transactionRepository.save(transaction);
+
         ticket.setTransaction(transaction);
 
         user.getTicketList().add(ticket);
@@ -51,9 +53,13 @@ public class TicketService {
 
         userRepository.save(user);
         eventRepository.save(event);
-        transactionRepository.save(transaction);
 
         return transferTicketToTicketDto(ticketRepository.save(ticket));
+    }
+
+    public List<TicketDto> findAllTickets() {
+        List<Ticket> ticketList = ticketRepository.findAll();
+        return transferTicketListToTicketDtoList(ticketList);
     }
 
     public TicketDto findTicketById(Long id) {
@@ -64,19 +70,14 @@ public class TicketService {
         return transferTicketToTicketDto(ticket);
     }
 
-    public TicketDto updateTicket(Long id, TicketDto ticketDto) {
-        Ticket ticket = ticketRepository.findById(id).orElse(null);
-        if (ticket == null) {
-            return null;
-        }
-        ticket.setId(ticketDto.getId());
-        ticket.setPrice(ticketDto.getPrice());
-        return transferTicketToTicketDto(ticketRepository.save(ticket));
-    }
-
     public boolean deleteTicket(Long id) {
         if (ticketRepository.existsById(id)) {
+            Ticket ticket = ticketRepository.findById(id).orElse(null);
+            if (ticket != null && transactionRepository.existsById(ticket.getTransaction().getId())) {
+                transactionRepository.findById(ticket.getTransaction().getId()).ifPresent(transaction -> transactionRepository.deleteById(transaction.getId()));
+            }
             ticketRepository.deleteById(id);
+
             return true;
         }
         return false;
@@ -86,27 +87,33 @@ public class TicketService {
         List<TicketDto> ticketDtoList = new ArrayList<>();
 
         for (Ticket ticket : ticketList) {
-            TicketDto ticketDto = new TicketDto();
-            ticketDto.setId(ticket.getId());
-            ticketDto.setPrice(ticket.getPrice());
-            ticketDtoList.add(ticketDto);
+            ticketDtoList.add(transferTicketToTicketDto(ticket));
+
         }
         return ticketDtoList;
     }
 
-    public Ticket transferTicketDtoToTicket(TicketDto ticketDto) {
-        Ticket ticket = new Ticket();
-        ticket.setId(ticketDto.getId());
-        ticket.setPrice(ticketDto.getPrice());
-
-        return ticket;
-    }
+//    public Ticket transferTicketDtoToTicket(TicketDto ticketDto) {
+//        Ticket ticket = new Ticket();
+//        ticket.setId(ticketDto.getId());
+//        ticket.setPrice(ticketDto.getPrice());
+//        ticket.setEvent(ticketDto.getEvent());
+//        ticket.setTransaction(ticketDto.getTransaction());
+//        ticket.setUser(ticketDto.getUser());
+//
+//        return ticket;
+//    }
 
     public TicketDto transferTicketToTicketDto(Ticket ticket) {
         TicketDto ticketDto = new TicketDto();
+        System.out.println(ticket.getId());
 
         ticketDto.setId(ticket.getId());
         ticketDto.setPrice(ticket.getPrice());
+
+        ticketDto.setEvent(ticket.getEvent());
+        ticketDto.setTransaction(ticket.getTransaction());
+        ticketDto.setUser(ticket.getUser());
 
         return ticketDto;
     }

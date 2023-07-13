@@ -16,14 +16,14 @@ public class TransactionService {
         this.transactionRepository = transactionRepository;
     }
 
-    public List<TransactionDto> findAllTransactions() {
-        List<Transaction> transactionList = transactionRepository.findAll();
-        return transferTransactionListToTransactionDtoList(transactionList);
-    }
-
     public TransactionDto createTransaction(TransactionDto transactionDto) {
         Transaction transaction = transferTransactionDtoToTransaction(transactionDto);
         return transferTransactionToTransactionDto(transactionRepository.save(transaction));
+    }
+
+    public List<TransactionDto> findAllTransactions() {
+        List<Transaction> transactionList = transactionRepository.findAll();
+        return transferTransactionListToTransactionDtoList(transactionList);
     }
 
     public TransactionDto findTransactionById(Long id) {
@@ -45,7 +45,7 @@ public class TransactionService {
     }
 
     public boolean deleteTransaction(Long id) {
-        if(transactionRepository.existsById(id)) {
+        if (transactionRepository.existsById(id)) {
             transactionRepository.deleteById(id);
             return true;
         }

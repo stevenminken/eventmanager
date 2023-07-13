@@ -1,14 +1,13 @@
 package nl.novi.eventmanager900102055.services;
 
+import nl.novi.eventmanager900102055.dtos.ArtistDto;
 import nl.novi.eventmanager900102055.dtos.EventDto;
 import nl.novi.eventmanager900102055.exceptions.NameDuplicateException;
 import nl.novi.eventmanager900102055.exceptions.ResourceNotFoundException;
-import nl.novi.eventmanager900102055.models.Artist;
 import nl.novi.eventmanager900102055.models.Event;
 import nl.novi.eventmanager900102055.models.User;
 import nl.novi.eventmanager900102055.repositories.ArtistRepository;
 import nl.novi.eventmanager900102055.repositories.EventRepository;
-import nl.novi.eventmanager900102055.repositories.TicketRepository;
 import nl.novi.eventmanager900102055.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -19,49 +18,19 @@ import java.util.List;
 public class EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
-    private final ArtistRepository artistRepository;
 
-    public EventService(EventRepository eventRepository, UserRepository userRepository, ArtistRepository artistRepository) {
+    public EventService(EventRepository eventRepository, UserRepository userRepository) {
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
-        this.artistRepository = artistRepository;
     }
 
-    public List<EventDto> findAllEvents() {
-        List<Event> eventList = eventRepository.findAll();
-        return transferEventListToEventDtoList(eventList);
-    }
+    public EventDto createEvent(EventDto eventDto, String username) throws NameDuplicateException, ResourceNotFoundException {
+        User user = userRepository.findById(username).orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
 
-    public EventDto findEventById(Long id) throws ResourceNotFoundException {
-        Event event = eventRepository.findById(id).orElse(null);
-        if (event == null) {
-            throw new ResourceNotFoundException("Can't find this event");
-        }
-        return transferEventToEventDto(event);
-    }
-    public List<EventDto> getEventByName(String name) throws ResourceNotFoundException {
-        Iterable<Event> iterableEvents = eventRepository.findByName(name);
-        if(iterableEvents == null) {
-            throw new ResourceNotFoundException("Can't find this event");
-        }
-        ArrayList<Event> eventList = new ArrayList<>();
-
-        for (Event event : iterableEvents) {
-            eventList.add(event);
-        }
-
-        return transferEventListToEventDtoList(eventList);
-    }
-    public EventDto createEvent(EventDto eventDto){return new EventDto();};
-
-        public EventDto createEvent(EventDto eventDto, long userId, List<Long> artistIds) throws NameDuplicateException {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-        Iterable<Event> Events = eventRepository.findAll();
-        for (Event l : Events) {
-            if (l.getName().equals(eventDto.getName())) {
-                throw new NameDuplicateException("This Event already exists");
+        Iterable<Event> events = eventRepository.findAll();
+        for (Event event : events) {
+            if (event.getName().equals(eventDto.getName())) {
+                throw new NameDuplicateException("This event already exists");
             }
         }
         Event event = transferEventDtoToEvent(eventDto);
@@ -69,52 +38,56 @@ public class EventService {
         event.setUser(user);
         user.getEventList().add(event);
 
-        List<Artist> artists = artistRepository.findAllById(artistIds);
-        event.setArtists(artists);
-        for (Artist artist : artists) {
-            artist.getEvents().add(event);
-        }
-
         userRepository.save(user);
-
-        return transferEventToEventDto(eventRepository.save(event));
+        event = eventRepository.save(event);
+        return transferEventToEventDto(event);
     }
 
-    public EventDto updateEvent(Long id, EventDto eventDto) throws ResourceNotFoundException {
+    public List<EventDto> findAllEvents() {
+        List<Event> eventList = eventRepository.findAll();
+        return transferEventListToEventDtoList(eventList);
+    }
+
+    public EventDto findEventById(Long id) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("event not found"));
+        return transferEventToEventDto(event);
+    }
+
+    public EventDto findEventByName(String name) throws ResourceNotFoundException {
+        Event event = eventRepository.findByName(name);
+        if (event == null) {
+            throw new ResourceNotFoundException("Event not found");
+        }
+        return transferEventToEventDto(event);
+    }
+
+    public EventDto updateEvent(Long id, EventDto eventDto) {
         Event event = eventRepository.findById(id).orElse(null);
         if (event == null) {
-            throw new ResourceNotFoundException("Can't find this event");
+            return null;
         }
         event.setName(eventDto.getName());
         event.setDate(eventDto.getDate());
         event.setAvailability(eventDto.getAvailability());
         event.setTicketsSold(eventDto.getTicketsSold());
+
         return transferEventToEventDto(eventRepository.save(event));
     }
 
-    public void deleteEvent(Long id) throws ResourceNotFoundException {
+    public boolean deleteEvent(Long id) {
         if (eventRepository.existsById(id)) {
             eventRepository.deleteById(id);
-        } else {
-            throw new ResourceNotFoundException("Event not found with ID: " + id);
+            return true;
         }
+        return false;
     }
 
-//    public List<EventDto> findEventsByFilter(String filter) {
-//        return eventRepository.findByFilter(filter).stream().map(Event::toDTO).collect(Collectors.toList());
-//    }
-
-    public static List<EventDto> transferEventListToEventDtoList(List<Event> eventList) {
+    public List<EventDto> transferEventListToEventDtoList(List<Event> eventList) {
         List<EventDto> eventDtoList = new ArrayList<>();
 
         for (Event event : eventList) {
-            EventDto eventDto = new EventDto();
-            eventDto.setId(event.getId());
-            eventDto.setName(event.getName());
-            eventDto.setDate(event.getDate());
-            eventDto.setAvailability(event.getAvailability());
-            eventDto.setTicketsSold(event.getTicketsSold());
-            eventDtoList.add(eventDto);
+            eventDtoList.add(transferEventToEventDto(event));
         }
         return eventDtoList;
     }

@@ -4,5 +4,5 @@ import nl.novi.eventmanager900102055.models.Event;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
-    Iterable<Event> findByName(String name);
+    Event findByName(String name);
 }

@@ -1,5 +1,6 @@
 package nl.novi.eventmanager900102055.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -11,10 +12,13 @@ public class Ticket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Double price;
-    @OneToOne(mappedBy = "ticket")
+    @JsonIgnore
+    @OneToOne(mappedBy = "ticket", cascade = CascadeType.ALL)
     private Transaction transaction;
+    @JsonIgnore
     @ManyToOne
     private Event event;
+    @JsonIgnore
     @ManyToOne
     private User user;
 

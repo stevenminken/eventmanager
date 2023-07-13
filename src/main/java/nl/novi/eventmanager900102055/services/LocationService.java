@@ -1,5 +1,6 @@
 package nl.novi.eventmanager900102055.services;
 
+import nl.novi.eventmanager900102055.dtos.EventDto;
 import nl.novi.eventmanager900102055.dtos.LocationDto;
 import nl.novi.eventmanager900102055.exceptions.NameDuplicateException;
 import nl.novi.eventmanager900102055.exceptions.ResourceNotFoundException;
@@ -22,17 +23,11 @@ public class LocationService {
         this.userRepository = userRepository;
     }
 
-    public List<LocationDto> findAllLocations() {
-        List<Location> locationList = locationRepository.findAll();
-        return transferLocationListToLocationDtoList(locationList);
-    }
+    public LocationDto createLocation(LocationDto locationDto, String username) throws NameDuplicateException, ResourceNotFoundException {
+        User user = userRepository.findById(username).orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
 
-    public LocationDto createLocation(LocationDto locationDto, long userId) throws NameDuplicateException {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-        Iterable<Location> Locations = locationRepository.findAll();
-        for (Location l : Locations) {
+        Iterable<Location> locations = locationRepository.findAll();
+        for (Location l : locations) {
             if (l.getName().equals(locationDto.getName())) {
                 throw new NameDuplicateException("This Location already exists");
             }
@@ -43,30 +38,26 @@ public class LocationService {
         user.getLocationList().add(location);
 
         userRepository.save(user);
-
-        return transferLocationToLocationDto(locationRepository.save(location));
+        location = locationRepository.save(location);
+        return transferLocationToLocationDto(location);
+    }
+    public List<LocationDto> findAllLocations() {
+        List<Location> locationList = locationRepository.findAll();
+        return transferLocationListToLocationDtoList(locationList);
     }
 
     public LocationDto findLocationById(Long id) {
-        Location location = locationRepository.findById(id).orElse(null);
-        if (location == null) {
-            return null;
-        }
-        return transferLocationToLocationDto(location);
+        Location Location = locationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Location not found"));
+        return transferLocationToLocationDto(Location);
     }
 
-    public List<LocationDto> getLocationByName(String name) throws ResourceNotFoundException {
-        Iterable<Location> iterableLocations = locationRepository.findByName(name);
-        if (iterableLocations == null) {
-            throw new ResourceNotFoundException("Can't find this location");
+    public LocationDto findLocationByName(String name) throws ResourceNotFoundException {
+        Location location  = locationRepository.findByName(name);
+        if (location == null) {
+            throw new ResourceNotFoundException("Location not found");
         }
-        ArrayList<Location> locationList = new ArrayList<>();
-
-        for (Location location : iterableLocations) {
-            locationList.add(location);
-        }
-
-        return transferLocationListToLocationDtoList(locationList);
+        return transferLocationToLocationDto(location);
     }
 
     public LocationDto updateLocation(Long id, LocationDto locationDto) {
@@ -78,6 +69,7 @@ public class LocationService {
         location.setAddress(locationDto.getAddress());
         location.setEmail(locationDto.getEmail());
         location.setNumberOfSeats(locationDto.getNumberOfSeats());
+
         return transferLocationToLocationDto(locationRepository.save(location));
     }
 
@@ -93,13 +85,7 @@ public class LocationService {
         List<LocationDto> locationDtoList = new ArrayList<>();
 
         for (Location location : locationList) {
-            LocationDto locationDto = new LocationDto();
-            locationDto.setId(location.getId());
-            locationDto.setName(location.getName());
-            locationDto.setAddress(location.getAddress());
-            locationDto.setEmail(location.getEmail());
-            locationDto.setNumberOfSeats(location.getNumberOfSeats());
-            locationDtoList.add(locationDto);
+            locationDtoList.add(transferLocationToLocationDto(location));
         }
         return locationDtoList;
     }

@@ -1,10 +1,16 @@
 package nl.novi.eventmanager900102055.dtos;
 
+import jakarta.validation.constraints.NotNull;
+
 public class LocationDto {
     private Long id;
+    @NotNull
     private String name;
+    @NotNull
     private String address;
+    @NotNull
     private String email;
+    @NotNull
     private Integer numberOfSeats;
 
     public LocationDto() {

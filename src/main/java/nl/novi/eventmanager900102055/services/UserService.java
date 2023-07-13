@@ -3,12 +3,17 @@ package nl.novi.eventmanager900102055.services;
 import nl.novi.eventmanager900102055.dtos.UserDto;
 import nl.novi.eventmanager900102055.exceptions.NameDuplicateException;
 import nl.novi.eventmanager900102055.exceptions.ResourceNotFoundException;
+import nl.novi.eventmanager900102055.models.Authority;
 import nl.novi.eventmanager900102055.models.User;
 import nl.novi.eventmanager900102055.repositories.UserRepository;
+import nl.novi.eventmanager900102055.utils.RandomStringGenerator;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -18,102 +23,117 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    public String createUser(UserDto userDto) throws NameDuplicateException {
+
+        Iterable<User> Users = userRepository.findAll();
+        for (User user : Users) {
+            if (user.getUsername().equals(userDto.getUsername())) {
+                throw new NameDuplicateException("This user already exists");
+            }
+        }
+        String randomString = RandomStringGenerator.generateAlphaNumeric(20);
+        userDto.setApikey(randomString);
+        User user = transferUserDtoToUser(userDto);
+
+        user = userRepository.save(user);
+        return user.getUsername();
+    }
+
     public List<UserDto> findAllUsers() {
         List<User> userList = userRepository.findAll();
         return transferUserListToUserDtoList(userList);
     }
 
-    public UserDto createUser(UserDto userDto) throws NameDuplicateException {
-        Iterable<User> allUsers = userRepository.findAll();
-        for (User u: allUsers) {
-            if (u.getName().equals(userDto.getName())) {
-                throw new NameDuplicateException("This User already exists");
-            }
+    public UserDto findUserByUsername(String username) {
+        UserDto dto = new UserDto();
+        Optional<User> user = userRepository.findById(username);
+        if (user.isPresent()) {
+            dto = transferUserToUserDto(user.get());
+        } else {
+            throw new UsernameNotFoundException(username);
         }
-        User user = transferUserDtoToUser(userDto);
-        return transferUserToUserDto(userRepository.save(user));
+        return dto;
     }
 
-    public UserDto findUserById(Long id) {
-        User user = userRepository.findById(id).orElse(null);
-        if (user == null) {
-            return null;
-        }
-        return transferUserToUserDto(user);
-    }
-    public List<UserDto> getUserByName(String name) throws ResourceNotFoundException {
-        Iterable<User> iterableUsers = userRepository.findByName(name);
-        if(iterableUsers == null) {
-            throw new ResourceNotFoundException("Can't find this user");
-        }
-        ArrayList<User> userList = new ArrayList<>();
-
-        for (User user : iterableUsers) {
-            userList.add(user);
-        }
-
-        return transferUserListToUserDtoList(userList);
+    public boolean userExists(String username) {
+        return userRepository.existsById(username);
     }
 
-    public UserDto updateUser(Long id, UserDto userDto) {
-        User user = userRepository.findById(id).orElse(null);
-        if (user == null) {
-            return null;
-        }
-        user.setUsername(userDto.getUsername());
-        user.setPassword(userDto.getPassword());
-        user.setName(user.getName());
-        user.setAddress(userDto.getAddress());
-        user.setPhoneNumber(userDto.getPhoneNumber());
-        return transferUserToUserDto(userRepository.save(user));
+    public void updateUser(String username, UserDto newUser) throws ResourceNotFoundException {
+        User user = userRepository.findById(username).orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
+
+        user.setUsername(newUser.getUsername());
+        user.setPassword(newUser.getPassword());
+        user.setEnabled(newUser.getEnabled());
+        user.setApikey(newUser.getApikey());
+        user.setEmail(newUser.getEmail());
+        userRepository.save(user);
     }
 
-    public boolean deleteUser(Long id) {
-        if(userRepository.existsById(id)) {
-            userRepository.deleteById(id);
-            return true;
+
+    public void deleteUser(String username) {
+        if (userExists(username)) {
+            userRepository.deleteById(username);
         }
-        return false;
+    }
+
+    public Set<Authority> getAuthorities(String username) throws ResourceNotFoundException {
+        User user = userRepository.findById(username).orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
+
+        UserDto userDto = transferUserToUserDto(user);
+        return userDto.getAuthorities();
+    }
+
+    public void addAuthority(String username, String authority) throws ResourceNotFoundException {
+        User user = userRepository.findById(username).orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
+
+        user.addAuthority(new Authority(username, authority));
+        userRepository.save(user);
+    }
+
+    public void removeAuthority(String username, String authority) throws ResourceNotFoundException {
+        User user = userRepository.findById(username).orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
+
+        Optional<Authority> optionalAuthorityToRemove = user.getAuthorities()
+                .stream()
+                .filter(a -> a.getAuthority().equalsIgnoreCase(authority))
+                .findAny();
+
+        if (optionalAuthorityToRemove.isPresent()) {
+            Authority authorityToRemove = optionalAuthorityToRemove.get();
+            user.removeAuthority(authorityToRemove);
+            userRepository.save(user);
+        } else {
+            throw new ResourceNotFoundException("Authority not found: " + authority);
+        }
     }
 
     public List<UserDto> transferUserListToUserDtoList(List<User> userList) {
-        List<UserDto> userDtoList = new ArrayList<>();
-
-        for (User user : userList) {
-            UserDto userDto = new UserDto();
-            userDto.setId(user.getId());
-            userDto.setUsername(user.getUsername());
-            userDto.setPassword(user.getPassword());
-            userDto.setName(user.getName());
-            userDto.setAddress(user.getAddress());
-            userDto.setPhoneNumber(user.getPhoneNumber());
-            userDtoList.add(userDto);
-        }
-        return userDtoList;
+        return userList.stream()
+                .map(this::transferUserToUserDto)
+                .collect(Collectors.toList());
     }
 
     public User transferUserDtoToUser(UserDto userDto) {
         User user = new User();
-        user.setId(userDto.getId());
         user.setUsername(userDto.getUsername());
         user.setPassword(userDto.getPassword());
-        user.setName(user.getName());
-        user.setAddress(userDto.getAddress());
-        user.setPhoneNumber(userDto.getPhoneNumber());
+        user.setEnabled(userDto.getEnabled());
+        user.setApikey(userDto.getApikey());
+        user.setEmail(userDto.getEmail());
 
         return user;
     }
 
     public UserDto transferUserToUserDto(User user) {
         UserDto userDto = new UserDto();
-
-        userDto.setId(user.getId());
         userDto.setUsername(user.getUsername());
         userDto.setPassword(user.getPassword());
-        userDto.setName(user.getName());
-        userDto.setAddress(user.getAddress());
-        userDto.setPhoneNumber(user.getPhoneNumber());
-
+        userDto.setEnabled(user.isEnabled());
+        userDto.setApikey(user.getApikey());
+        userDto.setEmail(user.getEmail());
+        userDto.setAuthorities(user.getAuthorities());
         return userDto;
     }
+
 }

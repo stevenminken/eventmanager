@@ -2,6 +2,7 @@ package nl.novi.eventmanager900102055.models;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,12 +15,15 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private Date date;
+    private LocalDate date;
     private Integer availability;
+    @Column(name = "tickets_sold")
     private Integer ticketsSold;
     @ManyToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "location_list")
     private List<Location> locationList;
     @ManyToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "artist_list")
     private List<Artist> artistList;
     @ManyToOne
     private User user;
@@ -31,7 +35,7 @@ public class Event {
     public Event() {
     }
 
-    public Event(String name, Date date, Integer availability, Integer ticketsSold) {
+    public Event(String name, LocalDate date, Integer availability, Integer ticketsSold) {
         this.name = name;
         this.date = date;
         this.availability = availability;
@@ -54,11 +58,11 @@ public class Event {
         this.name = name;
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
