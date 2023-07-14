@@ -8,6 +8,7 @@ import nl.novi.eventmanager900102055.models.User;
 import nl.novi.eventmanager900102055.repositories.UserRepository;
 import nl.novi.eventmanager900102055.utils.RandomStringGenerator;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,24 +19,30 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    public String createUser(UserDto userDto) throws NameDuplicateException {
-
-        Iterable<User> Users = userRepository.findAll();
-        for (User user : Users) {
+    public String createUser(UserDto userDto) throws NameDuplicateException, ResourceNotFoundException {
+        Iterable<User> users = userRepository.findAll();
+        for (User user : users) {
             if (user.getUsername().equals(userDto.getUsername())) {
                 throw new NameDuplicateException("This user already exists");
             }
         }
+
         String randomString = RandomStringGenerator.generateAlphaNumeric(20);
         userDto.setApikey(randomString);
-        User user = transferUserDtoToUser(userDto);
 
+        String encodedPassword = passwordEncoder.encode(userDto.getPassword());
+        userDto.setPassword(encodedPassword);
+
+        User user = transferUserDtoToUser(userDto);
         user = userRepository.save(user);
+        addAuthority(user.getUsername(), "ROLE_USER");
         return user.getUsername();
     }
 
@@ -46,9 +53,9 @@ public class UserService {
 
     public UserDto findUserByUsername(String username) {
         UserDto dto = new UserDto();
-        Optional<User> user = userRepository.findById(username);
-        if (user.isPresent()) {
-            dto = transferUserToUserDto(user.get());
+        User user = userRepository.findByUsername(username);
+        if (user != null) {
+            dto = transferUserToUserDto(user);
         } else {
             throw new UsernameNotFoundException(username);
         }
@@ -59,15 +66,14 @@ public class UserService {
         return userRepository.existsById(username);
     }
 
-    public void updateUser(String username, UserDto newUser) throws ResourceNotFoundException {
-        User user = userRepository.findById(username).orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
-
-        user.setUsername(newUser.getUsername());
-        user.setPassword(newUser.getPassword());
-        user.setEnabled(newUser.getEnabled());
-        user.setApikey(newUser.getApikey());
-        user.setEmail(newUser.getEmail());
-        userRepository.save(user);
+    public void updateUserPassword(UserDto userDto) throws ResourceNotFoundException {
+        User user = userRepository.findByUsername(userDto.getUsername());
+        if (user == null) {
+            throw new ResourceNotFoundException("User does not exist");
+        } else {
+            user.setPassword(userDto.getPassword());
+            userRepository.save(user);
+        }
     }
 
 
@@ -125,12 +131,10 @@ public class UserService {
         return user;
     }
 
+    //TODO different return user/ admin
     public UserDto transferUserToUserDto(User user) {
         UserDto userDto = new UserDto();
         userDto.setUsername(user.getUsername());
-        userDto.setPassword(user.getPassword());
-        userDto.setEnabled(user.isEnabled());
-        userDto.setApikey(user.getApikey());
         userDto.setEmail(user.getEmail());
         userDto.setAuthorities(user.getAuthorities());
         return userDto;

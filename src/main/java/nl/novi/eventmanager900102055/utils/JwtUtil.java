@@ -18,7 +18,7 @@ import java.util.function.Function;
 public class JwtUtil {
 
     // De secret key moet minimaal 256 bits lang zijn, of grofweg 45 characters
-    private final static String SECRET_KEY = "123456789123456789123456789123456789123456789";
+    private final static String SECRET_KEY = "Nku96tf43vb3scfgy5trcsd321qadf4589ikjhtfdcbnt";
 
     private Key getSigningKey() {
         byte[] keyBytes =  Decoders.BASE64.decode(SECRET_KEY);
@@ -56,7 +56,7 @@ public class JwtUtil {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 10))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 10)) // 10 days
                 .signWith(getSigningKey() ,SignatureAlgorithm.HS256)
                 .compact();
     }

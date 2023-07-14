@@ -1,12 +1,10 @@
 package nl.novi.eventmanager900102055.controllers;
 
 import jakarta.validation.Valid;
-import nl.novi.eventmanager900102055.dtos.EventDto;
 import nl.novi.eventmanager900102055.dtos.LocationDto;
 import nl.novi.eventmanager900102055.exceptions.NameDuplicateException;
 import nl.novi.eventmanager900102055.exceptions.ResourceNotFoundException;
 import nl.novi.eventmanager900102055.services.LocationService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -56,8 +54,8 @@ public class LocationController {
         return ResponseEntity.ok().body(locationDtoList);
     }
 
-    @GetMapping(params = "id")
-    public ResponseEntity<Object> findLocationById(@RequestParam("id") Long id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<Object> findLocationById(@PathVariable("id") Long id) {
         try {
             LocationDto locationDto = locationService.findLocationById(id);
             return ResponseEntity.ok().body(locationDto);
@@ -79,7 +77,7 @@ public class LocationController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updatelocation(@PathVariable("id") Long id, @Valid @RequestBody LocationDto locationDto, BindingResult br) {
+    public ResponseEntity<Object> updateLocation(@PathVariable("id") Long id, @Valid @RequestBody LocationDto locationDto, BindingResult br) {
         if (br.hasFieldErrors()) {
             StringBuilder sb = new StringBuilder();
             for (FieldError fe : br.getFieldErrors()) {
@@ -95,7 +93,7 @@ public class LocationController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deletelocation(@PathVariable("id") Long id) {
+    public ResponseEntity<Object> deleteLocation(@PathVariable("id") Long id) {
         boolean deleted = locationService.deleteLocation(id);
         if (deleted) {
             return ResponseEntity.ok().body("location deleted");

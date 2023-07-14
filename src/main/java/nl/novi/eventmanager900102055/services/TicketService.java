@@ -1,8 +1,6 @@
 package nl.novi.eventmanager900102055.services;
 
-import nl.novi.eventmanager900102055.dtos.EventDto;
 import nl.novi.eventmanager900102055.dtos.TicketDto;
-import nl.novi.eventmanager900102055.exceptions.NameDuplicateException;
 import nl.novi.eventmanager900102055.exceptions.ResourceNotFoundException;
 import nl.novi.eventmanager900102055.models.Event;
 import nl.novi.eventmanager900102055.models.Ticket;
@@ -24,37 +22,46 @@ public class TicketService {
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
     private final TransactionRepository transactionRepository;
+    private final EventService eventService;
+    private final UserService userService;
+    private final TransactionService transactionService;
 
-    public TicketService(TicketRepository ticketRepository, UserRepository userRepository, EventRepository eventRepository, TransactionRepository transactionRepository) {
+    public TicketService(TicketRepository ticketRepository, UserRepository userRepository, EventRepository eventRepository, TransactionRepository transactionRepository, EventService eventService, UserService userService, TransactionService transactionService) {
         this.ticketRepository = ticketRepository;
         this.userRepository = userRepository;
         this.eventRepository = eventRepository;
         this.transactionRepository = transactionRepository;
+        this.eventService = eventService;
+        this.userService = userService;
+        this.transactionService = transactionService;
     }
 
     public TicketDto createTicket(Long eventId, String username, Double price) throws ResourceNotFoundException {
-        User user = userRepository.findById(username).orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new ResourceNotFoundException("User does not exist");
+        } else {
 
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new IllegalArgumentException("Event not found"));
+            Event event = eventRepository.findById(eventId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
 
-        Ticket ticket = new Ticket(user, event, price);
+            Ticket ticket = new Ticket(user, event, price);
 
-        Transaction transaction = new Transaction();
-        transaction.setDateOfPurchase(LocalDate.now());
-        transaction.setPaymentMethod("creditcard");
-        transaction.setTicket(ticket);
-//        transactionRepository.save(transaction);
+            Transaction transaction = new Transaction();
+            transaction.setDateOfPurchase(LocalDate.now());
+            transaction.setPaymentMethod("creditcard");
+            transaction.setTicket(ticket);
 
-        ticket.setTransaction(transaction);
+            ticket.setTransaction(transaction);
 
-        user.getTicketList().add(ticket);
-        event.getTicketList().add(ticket);
+            user.getTicketList().add(ticket);
+            event.getTicketList().add(ticket);
 
-        userRepository.save(user);
-        eventRepository.save(event);
+            userRepository.save(user);
+            eventRepository.save(event);
 
-        return transferTicketToTicketDto(ticketRepository.save(ticket));
+            return transferTicketToTicketDto(ticketRepository.save(ticket));
+        }
     }
 
     public List<TicketDto> findAllTickets() {
@@ -111,9 +118,9 @@ public class TicketService {
         ticketDto.setId(ticket.getId());
         ticketDto.setPrice(ticket.getPrice());
 
-        ticketDto.setEvent(ticket.getEvent());
-        ticketDto.setTransaction(ticket.getTransaction());
-        ticketDto.setUser(ticket.getUser());
+        ticketDto.setEventDto(eventService.transferEventToEventDto(ticket.getEvent()));
+        ticketDto.setTransactionDto(transactionService.transferTransactionToTransactionDto(ticket.getTransaction()));
+        ticketDto.setUserDto(userService.transferUserToUserDto(ticket.getUser()));
 
         return ticketDto;
     }

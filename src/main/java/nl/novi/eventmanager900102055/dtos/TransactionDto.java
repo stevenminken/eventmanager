@@ -1,5 +1,6 @@
 package nl.novi.eventmanager900102055.dtos;
 
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
@@ -8,7 +9,7 @@ public class TransactionDto {
     private Long id;
     @NotNull
     private LocalDate dateOfPurchase;
-    @NotNull
+    @NotEmpty
     private String paymentMethod;
 
     public TransactionDto() {

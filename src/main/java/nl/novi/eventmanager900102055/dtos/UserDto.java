@@ -5,11 +5,15 @@ import nl.novi.eventmanager900102055.models.Authority;
 import java.util.Set;
 
 public class UserDto {
-
+//    @NotEmpty
+//    @Size(min = 2, message = "user name should have at least 2 characters")
     private String username;
+//    @NotEmpty
+//    @Size(min = 8, message = "password should have at least 8 characters")
     private String password;
     private Boolean enabled;
     private String apikey;
+//    @NotEmpty
     private String email;
     private Set<Authority> authorities;
 

@@ -1,12 +1,10 @@
 package nl.novi.eventmanager900102055.services;
 
-import nl.novi.eventmanager900102055.dtos.ArtistDto;
 import nl.novi.eventmanager900102055.dtos.EventDto;
 import nl.novi.eventmanager900102055.exceptions.NameDuplicateException;
 import nl.novi.eventmanager900102055.exceptions.ResourceNotFoundException;
 import nl.novi.eventmanager900102055.models.Event;
 import nl.novi.eventmanager900102055.models.User;
-import nl.novi.eventmanager900102055.repositories.ArtistRepository;
 import nl.novi.eventmanager900102055.repositories.EventRepository;
 import nl.novi.eventmanager900102055.repositories.UserRepository;
 import org.springframework.stereotype.Service;
@@ -107,10 +105,10 @@ public class EventService {
         EventDto eventDto = new EventDto();
 
         eventDto.setId(event.getId());
-        eventDto.setName(event.getName());
-        eventDto.setDate(event.getDate());
-        eventDto.setAvailability(event.getAvailability());
-        eventDto.setTicketsSold(event.getTicketsSold());
+//        eventDto.setName(event.getName());
+//        eventDto.setDate(event.getDate());
+//        eventDto.setAvailability(event.getAvailability());
+//        eventDto.setTicketsSold(event.getTicketsSold());
 
         return eventDto;
     }

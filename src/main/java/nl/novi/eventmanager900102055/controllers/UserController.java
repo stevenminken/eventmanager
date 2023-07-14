@@ -5,11 +5,10 @@ import nl.novi.eventmanager900102055.exceptions.BadRequestException;
 import nl.novi.eventmanager900102055.exceptions.NameDuplicateException;
 import nl.novi.eventmanager900102055.exceptions.ResourceNotFoundException;
 import nl.novi.eventmanager900102055.services.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
@@ -23,11 +22,19 @@ public class UserController {
         this.userService = userService;
     }
 
+    @PostMapping
+    public ResponseEntity<String> createUser(@RequestBody UserDto dto) throws NameDuplicateException, ResourceNotFoundException {
+
+        String newUsername = userService.createUser(dto);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body("User created: " + newUsername);
+    }
+
     @GetMapping
     public ResponseEntity<List<UserDto>> findAllUsers() {
 
-        List<UserDto> UserDtoList = userService.findAllUsers();
-        return ResponseEntity.ok().body(UserDtoList);
+        List<UserDto> userDtoList = userService.findAllUsers();
+        return ResponseEntity.ok().body(userDtoList);
     }
 
     @GetMapping(value = "/{username}")
@@ -37,22 +44,10 @@ public class UserController {
         return ResponseEntity.ok().body(optionalUser);
     }
 
-    @PostMapping
-    public ResponseEntity<UserDto> createUser(@RequestBody UserDto dto) throws NameDuplicateException, ResourceNotFoundException {
+    @PutMapping
+    public ResponseEntity<UserDto> updateUserPassword(@RequestBody UserDto userDto) throws ResourceNotFoundException {
 
-        String newUsername = userService.createUser(dto);
-        userService.addAuthority(newUsername, "ROLE_USER");
-
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{username}")
-                .buildAndExpand(newUsername).toUri();
-
-        return ResponseEntity.created(location).build();
-    }
-
-    @PutMapping(value = "/{username}")
-    public ResponseEntity<UserDto> updateUser(@PathVariable("username") String username, @RequestBody UserDto dto) throws ResourceNotFoundException {
-
-        userService.updateUser(username, dto);
+        userService.updateUserPassword(userDto);
         return ResponseEntity.noContent().build();
     }
 
@@ -68,8 +63,7 @@ public class UserController {
             String authorityName = (String) fields.get("authority");
             userService.addAuthority(username, authorityName);
             return ResponseEntity.noContent().build();
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw new BadRequestException();
         }
     }

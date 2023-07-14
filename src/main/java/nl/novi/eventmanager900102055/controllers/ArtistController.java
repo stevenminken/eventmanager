@@ -2,11 +2,9 @@ package nl.novi.eventmanager900102055.controllers;
 
 import jakarta.validation.Valid;
 import nl.novi.eventmanager900102055.dtos.ArtistDto;
-import nl.novi.eventmanager900102055.dtos.EventDto;
 import nl.novi.eventmanager900102055.exceptions.NameDuplicateException;
 import nl.novi.eventmanager900102055.exceptions.ResourceNotFoundException;
 import nl.novi.eventmanager900102055.services.ArtistService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -56,12 +54,11 @@ public class ArtistController {
         return ResponseEntity.ok().body(ArtistDtoList);
     }
 
-    //    http://localhost:8080/artists?id=1
-    @GetMapping(params = "id")
-    public ResponseEntity<Object> findArtistById(@RequestParam("id") Long id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<Object> findArtistById(@PathVariable("id") Long id) {
         try {
-            ArtistDto ArtistDto = artistService.findArtistById(id);
-            return ResponseEntity.ok().body(ArtistDto);
+            ArtistDto artistDto = artistService.findArtistById(id);
+            return ResponseEntity.ok().body(artistDto);
         } catch (Exception e) {
             String errorMessage = "Error occurred while fetching the artist: " + e.getMessage();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);

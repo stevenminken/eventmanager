@@ -5,7 +5,6 @@ import nl.novi.eventmanager900102055.dtos.EventDto;
 import nl.novi.eventmanager900102055.exceptions.NameDuplicateException;
 import nl.novi.eventmanager900102055.exceptions.ResourceNotFoundException;
 import nl.novi.eventmanager900102055.services.EventService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -51,16 +50,16 @@ public class EventController {
 
     @GetMapping
     public ResponseEntity<List<EventDto>> findAllEvents() {
-        List<EventDto> EventDtoList;
-        EventDtoList = eventService.findAllEvents();
-        return ResponseEntity.ok().body(EventDtoList);
+        List<EventDto> eventDtoList;
+        eventDtoList = eventService.findAllEvents();
+        return ResponseEntity.ok().body(eventDtoList);
     }
 
-    @GetMapping(params = "id")
-    public ResponseEntity<Object> findEventById(@RequestParam("id") Long id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<Object> findEventById(@PathVariable("id") Long id) {
         try {
-            EventDto EventDto = eventService.findEventById(id);
-            return ResponseEntity.ok().body(EventDto);
+            EventDto eventDto = eventService.findEventById(id);
+            return ResponseEntity.ok().body(eventDto);
         } catch (Exception e) {
             String errorMessage = "Error occurred while fetching the Event: " + e.getMessage();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);

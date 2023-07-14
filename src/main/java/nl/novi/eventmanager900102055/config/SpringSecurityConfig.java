@@ -49,13 +49,21 @@ public class SpringSecurityConfig {
     protected SecurityFilterChain filter (HttpSecurity http) throws Exception {
 
         http
-                .csrf().disable()
                 .httpBasic().disable()
                 .cors().and()
                 .authorizeHttpRequests()
-                // Wanneer je deze uncomments, staat je hele security open. Je hebt dan alleen nog een jwt nodig.
-                .requestMatchers("/**").permitAll()
 
+                // Wanneer je deze uncomments, staat je hele security open. Je hebt dan alleen nog een jwt nodig.
+//                .requestMatchers("/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/users").permitAll()
+
+                .requestMatchers("/authenticate").permitAll()
+                .requestMatchers("/authenticated").authenticated()
+
+                .requestMatchers(HttpMethod.GET, "/users", "/events", "/tickets").hasAnyRole("ADMIN", "USER")
+                .requestMatchers(HttpMethod.POST, "/events", "/tickets").hasAnyRole("ADMIN", "USER")
+                .requestMatchers(HttpMethod.PUT, "/users", "/events", "/tickets").hasAnyRole("ADMIN", "USER")
+                .requestMatchers(HttpMethod.DELETE, "/users", "/events", "/tickets").hasAnyRole("ADMIN", "USER")
 
                 .requestMatchers(HttpMethod.GET, "/users/**", "/transactions/**", "/events/**", "/locations/**", "/artists/**", "/tickets/**")
                 .hasRole("ADMIN")
@@ -66,19 +74,12 @@ public class SpringSecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/users/**", "/transactions/**", "/events/**", "/locations/**", "/artists/**", "/tickets/**")
                 .hasRole("ADMIN")
 
-
-                // Je mag meerdere paths tegelijk definieren
-                .requestMatchers(HttpMethod.GET, "/users", "/events", "/tickets").hasAnyRole("ADMIN", "USER")
-                .requestMatchers(HttpMethod.POST, "/users", "/events", "/tickets").hasAnyRole("ADMIN", "USER")
-                .requestMatchers(HttpMethod.PUT, "/users", "/events", "/tickets").hasAnyRole("ADMIN", "USER")
-                .requestMatchers(HttpMethod.DELETE, "/users", "/events", "/tickets").hasAnyRole("ADMIN", "USER")
-
-                .requestMatchers("/authenticated").authenticated()
-                .requestMatchers("/authenticate").permitAll()
                 .anyRequest().denyAll()
                 .and()
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+                .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 

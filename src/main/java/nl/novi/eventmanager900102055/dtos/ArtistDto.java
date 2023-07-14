@@ -1,13 +1,14 @@
 package nl.novi.eventmanager900102055.dtos;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 
 public class ArtistDto {
 
     private Long id;
-    @NotNull
+    @NotEmpty
     private String name;
-    @NotNull
+    @NotEmpty
     private String genre;
 
     public ArtistDto() {
