@@ -34,17 +34,11 @@ public class User {
             fetch = FetchType.EAGER)
     private Set<Authority> authorities = new HashSet<>();
     @OneToMany(mappedBy = "user")
-    @Column(name = "event_list")
-    private List<Event> eventList;
-    @OneToMany(mappedBy = "user")
     @Column(name = "ticket_list")
     private List<Ticket> ticketList;
     @OneToMany(mappedBy = "user")
     @Column(name = "location_list")
     private List<Location> locationList;
-    @OneToMany(mappedBy = "user")
-    @Column(name = "artist_list")
-    private List<Artist> artistList;
 
     public String getUsername() {
         return username;
@@ -98,14 +92,6 @@ public class User {
         this.authorities.remove(authority);
     }
 
-    public List<Event> getEventList() {
-        return eventList;
-    }
-
-    public void setEventList(List<Event> eventList) {
-        this.eventList = eventList;
-    }
-
     public List<Ticket> getTicketList() {
         return ticketList;
     }
@@ -122,11 +108,7 @@ public class User {
         this.locationList = locationList;
     }
 
-    public List<Artist> getArtistList() {
-        return artistList;
-    }
-
-    public void setArtistList(List<Artist> artistList) {
-        this.artistList = artistList;
+    public void setAuthorities(Set<Authority> authorities) {
+        this.authorities = authorities;
     }
 }

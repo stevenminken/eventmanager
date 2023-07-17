@@ -1,7 +1,11 @@
 package nl.novi.eventmanager900102055.dtos;
 
-import nl.novi.eventmanager900102055.models.Authority;
+import jakarta.persistence.Column;
+import jakarta.persistence.OneToMany;
+import nl.novi.eventmanager900102055.models.*;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class UserDto {
@@ -16,6 +20,8 @@ public class UserDto {
 //    @NotEmpty
     private String email;
     private Set<Authority> authorities;
+    private List<Ticket> ticketList;
+    private List<Location> locationList;
 
     public String getUsername() {
         return username;
@@ -64,4 +70,21 @@ public class UserDto {
     public void setAuthorities(Set<Authority> authorities) {
         this.authorities = authorities;
     }
+
+    public List<Ticket> getTicketList() {
+        return ticketList;
+    }
+
+    public void setTicketList(List<Ticket> ticketList) {
+        this.ticketList = ticketList;
+    }
+
+    public List<Location> getLocationList() {
+        return locationList;
+    }
+
+    public void setLocationList(List<Location> locationList) {
+        this.locationList = locationList;
+    }
+
 }

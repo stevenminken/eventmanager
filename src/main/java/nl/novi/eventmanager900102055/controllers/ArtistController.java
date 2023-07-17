@@ -25,8 +25,8 @@ public class ArtistController {
         this.artistService = artistService;
     }
 
-    @PostMapping("/{username}")
-    public ResponseEntity<Object> createArtist(@Valid @RequestBody ArtistDto ArtistDto, BindingResult bindingResult, @PathVariable("username") String username) throws NameDuplicateException, ResourceNotFoundException {
+    @PostMapping("/create_artist")
+    public ResponseEntity<Object> createArtist(@Valid @RequestBody ArtistDto ArtistDto, BindingResult bindingResult) throws NameDuplicateException, ResourceNotFoundException {
 
         if (bindingResult.hasFieldErrors()) {
             StringBuilder sb = new StringBuilder();
@@ -37,7 +37,7 @@ public class ArtistController {
             }
             return ResponseEntity.badRequest().body(sb.toString());
         } else {
-            ArtistDto dto = artistService.createArtist(ArtistDto, username);
+            ArtistDto dto = artistService.createArtist(ArtistDto);
             URI location = UriComponentsBuilder
                     .fromPath("/Artists/{lastName}")
                     .buildAndExpand(dto.getName())

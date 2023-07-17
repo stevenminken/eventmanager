@@ -2,6 +2,10 @@ package nl.novi.eventmanager900102055.dtos;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import nl.novi.eventmanager900102055.models.Event;
+import nl.novi.eventmanager900102055.models.User;
+
+import java.util.List;
 
 public class ArtistDto {
 
@@ -10,6 +14,7 @@ public class ArtistDto {
     private String name;
     @NotEmpty
     private String genre;
+    private List<Event> events;
 
     public ArtistDto() {
     }
@@ -34,7 +39,16 @@ public class ArtistDto {
         return genre;
     }
 
+    public List<Event> getEvents() {
+        return events;
+    }
+
+    public void setEvents(List<Event> events) {
+        this.events = events;
+    }
+
     public void setGenre(String genre) {
         this.genre = genre;
     }
+
 }

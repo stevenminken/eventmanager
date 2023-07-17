@@ -1,6 +1,10 @@
 package nl.novi.eventmanager900102055.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
@@ -10,15 +14,18 @@ public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
     private String address;
     private String email;
+
     @Column(name = "number_of_seats")
     private Integer numberOfSeats;
+    @JsonIgnore
     @ManyToOne
     private User user;
-    @ManyToMany(mappedBy = "locationList")
-    @Column(name = "event_list")
+    @JsonIgnore
+    @OneToMany(mappedBy = "location")
     private List<Event> eventList;
 
     public Location() {
@@ -30,8 +37,6 @@ public class Location {
         this.email = email;
         this.numberOfSeats = numberOfSeats;
     }
-
-
 
     public Long getId() {
         return id;

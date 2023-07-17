@@ -54,16 +54,16 @@ public class SpringSecurityConfig {
                 .authorizeHttpRequests()
 
                 // Wanneer je deze uncomments, staat je hele security open. Je hebt dan alleen nog een jwt nodig.
-//                .requestMatchers("/**").permitAll()
+                .requestMatchers("/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/users").permitAll()
 
                 .requestMatchers("/authenticate").permitAll()
                 .requestMatchers("/authenticated").authenticated()
 
-                .requestMatchers(HttpMethod.GET, "/users", "/events", "/tickets").hasAnyRole("ADMIN", "USER")
-                .requestMatchers(HttpMethod.POST, "/events", "/tickets").hasAnyRole("ADMIN", "USER")
-                .requestMatchers(HttpMethod.PUT, "/users", "/events", "/tickets").hasAnyRole("ADMIN", "USER")
-                .requestMatchers(HttpMethod.DELETE, "/users", "/events", "/tickets").hasAnyRole("ADMIN", "USER")
+                .requestMatchers(HttpMethod.GET, "/users/**", "/events/**", "/tickets/**").hasAnyRole("ADMIN", "USER")
+                .requestMatchers(HttpMethod.POST, "/events/**", "/tickets/**").hasAnyRole("ADMIN", "USER")
+                .requestMatchers(HttpMethod.PUT, "/users/**", "/events/**", "/tickets/**").hasAnyRole("ADMIN", "USER")
+                .requestMatchers(HttpMethod.DELETE, "/users/**", "/events/**", "/tickets/**").hasAnyRole("ADMIN", "USER")
 
                 .requestMatchers(HttpMethod.GET, "/users/**", "/transactions/**", "/events/**", "/locations/**", "/artists/**", "/tickets/**")
                 .hasRole("ADMIN")

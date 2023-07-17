@@ -3,8 +3,11 @@ package nl.novi.eventmanager900102055.controllers;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import nl.novi.eventmanager900102055.dtos.EventDto;
 import nl.novi.eventmanager900102055.dtos.TicketDto;
 import nl.novi.eventmanager900102055.exceptions.ResourceNotFoundException;
+import nl.novi.eventmanager900102055.exceptions.TicketsSoldOutException;
 import nl.novi.eventmanager900102055.services.TicketService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +30,7 @@ public class TicketController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createTicket(@RequestBody Map<String, Object> requestBody) throws ResourceNotFoundException {
+    public ResponseEntity<Object> createTicket(@RequestBody Map<String, Object> requestBody) throws ResourceNotFoundException, TicketsSoldOutException {
         long eventId = Long.parseLong(requestBody.get("eventId").toString());
         String username = requestBody.get("username").toString();
         double price = Double.parseDouble(requestBody.get("price").toString());
@@ -47,14 +50,27 @@ public class TicketController {
 
     @GetMapping
     public ResponseEntity<Object> findAllTickets() {
-
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        objectMapper.configure(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS, true);
+
         List<TicketDto> ticketDtoList = ticketService.findAllTickets();
         try {
             String json = objectMapper.writeValueAsString(ticketDtoList);
             return ResponseEntity.ok().body(json);
         } catch (JsonProcessingException e) {
             String errorMessage = "Error occurred while serializing ticket data: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+        }
+    }
+
+
+    @PostMapping("/usertickets")
+    public ResponseEntity<Object> findUserTickets(@RequestBody Map<String, Object>  requestBody) {
+        try {
+            List<TicketDto> ticketDtoList = ticketService.findUserTickets(requestBody.get("userId").toString());
+            return ResponseEntity.ok().body(ticketDtoList);
+        } catch (Exception e) {
+            String errorMessage = "Error occurred while fetching the tickets: " + e.getMessage();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
         }
     }

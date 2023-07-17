@@ -21,16 +21,12 @@ public class AuthenticationController {
 
     private final AuthenticationManager authenticationManager;
 
-    private final CustomUserDetailsService userDetailsService;
-
     private final JwtUtil jwtUtl;
 
-    public AuthenticationController(AuthenticationManager authenticationManager, CustomUserDetailsService userDetailsService, JwtUtil jwtUtl) {
+    public AuthenticationController(AuthenticationManager authenticationManager, JwtUtil jwtUtl) {
         this.authenticationManager = authenticationManager;
-        this.userDetailsService = userDetailsService;
         this.jwtUtl = jwtUtl;
     }
-
 
     /*
         Deze methode geeft de principal (basis user gegevens) terug van de ingelogde gebruiker

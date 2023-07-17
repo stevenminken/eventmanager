@@ -1,11 +1,16 @@
 package nl.novi.eventmanager900102055.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.novi.eventmanager900102055.dtos.EventDto;
 import nl.novi.eventmanager900102055.exceptions.NameDuplicateException;
 import nl.novi.eventmanager900102055.exceptions.ResourceNotFoundException;
+import nl.novi.eventmanager900102055.models.Artist;
 import nl.novi.eventmanager900102055.models.Event;
+import nl.novi.eventmanager900102055.models.Location;
 import nl.novi.eventmanager900102055.models.User;
+import nl.novi.eventmanager900102055.repositories.ArtistRepository;
 import nl.novi.eventmanager900102055.repositories.EventRepository;
+import nl.novi.eventmanager900102055.repositories.LocationRepository;
 import nl.novi.eventmanager900102055.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -16,10 +21,14 @@ import java.util.List;
 public class EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final LocationRepository locationRepository;
+    private final ArtistRepository artistRepository;
 
-    public EventService(EventRepository eventRepository, UserRepository userRepository) {
+    public EventService(EventRepository eventRepository, UserRepository userRepository, LocationRepository locationRepository, ArtistRepository artistRepository) {
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
+        this.locationRepository = locationRepository;
+        this.artistRepository = artistRepository;
     }
 
     public EventDto createEvent(EventDto eventDto, String username) throws NameDuplicateException, ResourceNotFoundException {
@@ -32,9 +41,6 @@ public class EventService {
             }
         }
         Event event = transferEventDtoToEvent(eventDto);
-
-        event.setUser(user);
-        user.getEventList().add(event);
 
         userRepository.save(user);
         event = eventRepository.save(event);
@@ -73,6 +79,28 @@ public class EventService {
         return transferEventToEventDto(eventRepository.save(event));
     }
 
+    public boolean addLocationToEvent(Long eventId, Long locationId) {
+        Event event = eventRepository.findById(eventId).orElse(null);
+        Location location = locationRepository.findById(locationId).orElse(null);
+        if (event == null || location == null || event.getLocation() != null) {
+            return false;
+        }
+        event.setLocation(location);
+        eventRepository.save(event);
+        return true;
+    }
+
+    public boolean addArtistToEvent(Long eventId, Long artistId) {
+        Event event = eventRepository.findById(eventId).orElse(null);
+        Artist artist = artistRepository.findById(artistId).orElse(null);
+        if (event == null || artist == null) {
+            return false;
+        }
+        event.getArtistList().add(artist);
+        eventRepository.save(event);
+        return true;
+    }
+
     public boolean deleteEvent(Long id) {
         if (eventRepository.existsById(id)) {
             eventRepository.deleteById(id);
@@ -97,6 +125,9 @@ public class EventService {
         event.setDate(eventDto.getDate());
         event.setAvailability(eventDto.getAvailability());
         event.setTicketsSold(eventDto.getTicketsSold());
+        event.setLocation((eventDto.getLocation()));
+        event.setArtistList(eventDto.getArtistList());
+        event.setTicketList(eventDto.getTicketList());
 
         return event;
     }
@@ -105,10 +136,13 @@ public class EventService {
         EventDto eventDto = new EventDto();
 
         eventDto.setId(event.getId());
-//        eventDto.setName(event.getName());
-//        eventDto.setDate(event.getDate());
-//        eventDto.setAvailability(event.getAvailability());
-//        eventDto.setTicketsSold(event.getTicketsSold());
+        eventDto.setName(event.getName());
+        eventDto.setDate(event.getDate());
+        eventDto.setAvailability(event.getAvailability());
+        eventDto.setTicketsSold(event.getTicketsSold());
+        eventDto.setLocation((event.getLocation()));
+        eventDto.setArtistList(event.getArtistList());
+        eventDto.setTicketList(event.getTicketList());
 
         return eventDto;
     }

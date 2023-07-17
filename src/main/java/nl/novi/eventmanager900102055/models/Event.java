@@ -19,18 +19,14 @@ public class Event {
     private Integer availability;
     @Column(name = "tickets_sold")
     private Integer ticketsSold;
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "location_list")
-    private List<Location> locationList;
+    @ManyToOne
+    @JoinColumn(name = "location_id")
+    private Location location;
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "artist_list")
     private List<Artist> artistList;
-    @ManyToOne
-    private User user;
     @OneToMany(mappedBy = "event")
     private List<Ticket> ticketList;
-    @ManyToMany(mappedBy = "events")
-    private List<Artist> artists;
 
     public Event() {
     }
@@ -82,12 +78,12 @@ public class Event {
         this.ticketsSold = ticketsSold;
     }
 
-    public List<Location> getLocationList() {
-        return locationList;
+    public Location getLocation() {
+        return location;
     }
 
-    public void setLocationList(List<Location> locationList) {
-        this.locationList = locationList;
+    public void setLocation(Location location) {
+        this.location = location;
     }
 
     public List<Artist> getArtistList() {
@@ -98,27 +94,12 @@ public class Event {
         this.artistList = artistList;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
     public List<Ticket> getTicketList() {
         return ticketList;
     }
 
     public void setTicketList(List<Ticket> ticketList) {
         this.ticketList = ticketList;
-    }
-    public List<Artist> getArtists() {
-        return artists;
-    }
-
-    public void setArtists(List<Artist> artists) {
-        this.artists = artists;
     }
 
     public String getDetails() {

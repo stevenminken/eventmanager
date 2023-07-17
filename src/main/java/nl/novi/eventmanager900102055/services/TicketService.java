@@ -2,6 +2,7 @@ package nl.novi.eventmanager900102055.services;
 
 import nl.novi.eventmanager900102055.dtos.TicketDto;
 import nl.novi.eventmanager900102055.exceptions.ResourceNotFoundException;
+import nl.novi.eventmanager900102055.exceptions.TicketsSoldOutException;
 import nl.novi.eventmanager900102055.models.Event;
 import nl.novi.eventmanager900102055.models.Ticket;
 import nl.novi.eventmanager900102055.models.Transaction;
@@ -13,8 +14,7 @@ import nl.novi.eventmanager900102055.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class TicketService {
@@ -36,7 +36,7 @@ public class TicketService {
         this.transactionService = transactionService;
     }
 
-    public TicketDto createTicket(Long eventId, String username, Double price) throws ResourceNotFoundException {
+    public TicketDto createTicket(Long eventId, String username, Double price) throws ResourceNotFoundException, TicketsSoldOutException {
         User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new ResourceNotFoundException("User does not exist");
@@ -45,28 +45,43 @@ public class TicketService {
             Event event = eventRepository.findById(eventId)
                     .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
 
-            Ticket ticket = new Ticket(user, event, price);
+            if (event.getAvailability() - event.getTicketsSold() > 0) {
+                Ticket ticket = new Ticket(user, event, price);
+                event.setAvailability(event.getAvailability() - 1);
+                event.setTicketsSold(event.getTicketsSold() + 1);
+                event.getTicketList().add(ticket);
+                user.getTicketList().add(ticket);
 
-            Transaction transaction = new Transaction();
-            transaction.setDateOfPurchase(LocalDate.now());
-            transaction.setPaymentMethod("creditcard");
-            transaction.setTicket(ticket);
+                Transaction transaction = new Transaction();
+                transaction.setDateOfPurchase(LocalDate.now());
+                transaction.setPaymentMethod("creditcard");
+                transaction.setTicket(ticket);
+                ticket.setTransaction(transaction);
 
-            ticket.setTransaction(transaction);
+                userRepository.save(user);
+                eventRepository.save(event);
 
-            user.getTicketList().add(ticket);
-            event.getTicketList().add(ticket);
-
-            userRepository.save(user);
-            eventRepository.save(event);
-
-            return transferTicketToTicketDto(ticketRepository.save(ticket));
+                return transferTicketToTicketDto(ticketRepository.save(ticket));
+            } else {
+                throw new TicketsSoldOutException("Tickets sold out");
+            }
         }
     }
 
     public List<TicketDto> findAllTickets() {
         List<Ticket> ticketList = ticketRepository.findAll();
         return transferTicketListToTicketDtoList(ticketList);
+    }
+
+    public List<TicketDto> findUserTickets(String userId) {
+        ArrayList<Ticket> ticketList = new ArrayList<>(ticketRepository.findAll());
+        ArrayList<Ticket> userTicketList = new ArrayList<>();
+        for (Ticket t : ticketList) {
+            if (t.getUser().getUsername().equals(userId)) {
+                userTicketList.add(t);
+            }
+        }
+        return transferTicketListToTicketDtoList(userTicketList);
     }
 
     public TicketDto findTicketById(Long id) {
@@ -80,15 +95,47 @@ public class TicketService {
     public boolean deleteTicket(Long id) {
         if (ticketRepository.existsById(id)) {
             Ticket ticket = ticketRepository.findById(id).orElse(null);
-            if (ticket != null && transactionRepository.existsById(ticket.getTransaction().getId())) {
-                transactionRepository.findById(ticket.getTransaction().getId()).ifPresent(transaction -> transactionRepository.deleteById(transaction.getId()));
+            if (ticket == null) {
+                return false;
             }
+
+            if (transactionRepository.existsById(ticket.getTransaction().getId())) {
+                transactionRepository.deleteById(ticket.getTransaction().getId());
+            }
+
+            Event event = ticket.getEvent();
+            ArrayList<Ticket> ticketListEvent = new ArrayList<>(event.getTicketList());
+            Iterator<Ticket> eventIterator = ticketListEvent.iterator();
+            while (eventIterator.hasNext()) {
+                Ticket ticketEvent = eventIterator.next();
+                if (Objects.equals(ticketEvent.getId(), ticket.getId())) {
+                    eventIterator.remove();
+                    break;
+                }
+            }
+            event.setAvailability(event.getAvailability() + 1);
+            event.setTicketsSold(event.getTicketsSold() - 1);
+
+            User user = ticket.getUser();
+            ArrayList<Ticket> ticketListUser = new ArrayList<>(user.getTicketList());
+            Iterator<Ticket> userIterator = ticketListUser.iterator();
+            while (userIterator.hasNext()) {
+                Ticket ticketUser = userIterator.next();
+                if (Objects.equals(ticketUser.getId(), ticket.getId())) {
+                    userIterator.remove();
+                    break;
+                }
+            }
+
+            userRepository.save(user);
+            eventRepository.save(event);
             ticketRepository.deleteById(id);
 
             return true;
         }
         return false;
     }
+
 
     public List<TicketDto> transferTicketListToTicketDtoList(List<Ticket> ticketList) {
         List<TicketDto> ticketDtoList = new ArrayList<>();

@@ -76,7 +76,6 @@ public class UserService {
         }
     }
 
-
     public void deleteUser(String username) {
         if (userExists(username)) {
             userRepository.deleteById(username);
@@ -131,7 +130,6 @@ public class UserService {
         return user;
     }
 
-    //TODO different return user/ admin
     public UserDto transferUserToUserDto(User user) {
         UserDto userDto = new UserDto();
         userDto.setUsername(user.getUsername());

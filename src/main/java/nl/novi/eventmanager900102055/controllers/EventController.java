@@ -1,7 +1,12 @@
 package nl.novi.eventmanager900102055.controllers;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import jakarta.validation.Valid;
 import nl.novi.eventmanager900102055.dtos.EventDto;
+import nl.novi.eventmanager900102055.dtos.TicketDto;
 import nl.novi.eventmanager900102055.exceptions.NameDuplicateException;
 import nl.novi.eventmanager900102055.exceptions.ResourceNotFoundException;
 import nl.novi.eventmanager900102055.services.EventService;
@@ -21,9 +26,11 @@ import java.util.Map;
 public class EventController {
     private final EventService eventService;
 
-    public EventController(EventService eventService) {
+    private final ObjectMapper objectMapper;
 
+    public EventController(EventService eventService, ObjectMapper objectMapper) {
         this.eventService = eventService;
+        this.objectMapper = objectMapper;
     }
 
     @PostMapping("/{username}")
@@ -49,11 +56,20 @@ public class EventController {
     }
 
     @GetMapping
-    public ResponseEntity<List<EventDto>> findAllEvents() {
-        List<EventDto> eventDtoList;
-        eventDtoList = eventService.findAllEvents();
-        return ResponseEntity.ok().body(eventDtoList);
+    public ResponseEntity<Object> findAllEvents() {
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        objectMapper.configure(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS, true);
+
+        List<EventDto> eventDtoList = eventService.findAllEvents();
+        try {
+            String json = objectMapper.writeValueAsString(eventDtoList);
+            return ResponseEntity.ok().body(json);
+        } catch (JsonProcessingException e) {
+            String errorMessage = "Error occurred while serializing event data: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+        }
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> findEventById(@PathVariable("id") Long id) {
@@ -90,6 +106,40 @@ public class EventController {
         } else {
             EventDto updatedEventDto = eventService.updateEvent(id, EventDto);
             return ResponseEntity.ok().body(updatedEventDto);
+        }
+    }
+
+    @PostMapping("/add_location")
+    public ResponseEntity<Object> addLocationToEvent(@RequestBody Map<String, Object> requestBody) {
+        try {
+            Long eventId = Long.parseLong(requestBody.get("eventId").toString());
+            Long locationId = Long.parseLong(requestBody.get("locationId").toString());
+            boolean added = eventService.addLocationToEvent(eventId, locationId);
+            if (added) {
+                return ResponseEntity.ok().body("Location added");
+            } else {
+                return ResponseEntity.badRequest().body("Location not added");
+            }
+        } catch (Exception e) {
+            String errorMessage = "Error occurred while adding the location: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+        }
+    }
+
+    @PostMapping("/add_artist")
+    public ResponseEntity<Object> addArtistToEvent(@RequestBody Map<String, Object> requestBody) {
+        try {
+            Long eventId = Long.parseLong(requestBody.get("eventId").toString());
+            Long artistId = Long.parseLong(requestBody.get("artistId").toString());
+            boolean added = eventService.addArtistToEvent(eventId, artistId);
+            if (added) {
+                return ResponseEntity.ok().body("Artist added");
+            } else {
+                return ResponseEntity.badRequest().body("Artist not added");
+            }
+        } catch (Exception e) {
+            String errorMessage = "Error occurred while adding the artist: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
         }
     }
 

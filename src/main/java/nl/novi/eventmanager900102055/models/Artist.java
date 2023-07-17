@@ -1,6 +1,8 @@
 package nl.novi.eventmanager900102055.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 import java.util.List;
 
@@ -10,10 +12,10 @@ public class Artist {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
     private String genre;
-    @ManyToOne
-    private User user;
+    @JsonIgnore
     @ManyToMany(mappedBy = "artistList")
     private List<Event> events;
 
@@ -49,14 +51,6 @@ public class Artist {
         this.genre = genre;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
     public List<Event> getEvents() {
         return events;
     }
@@ -68,4 +62,5 @@ public class Artist {
     public String getDetails() {
         return "details";
     }
+
 }

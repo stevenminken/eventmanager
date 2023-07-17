@@ -21,8 +21,7 @@ public class ArtistService {
             this.artistRepository = artistRepository;
             this.userRepository = userRepository;
     }
-    public ArtistDto createArtist(ArtistDto artistDto, String username) throws NameDuplicateException, ResourceNotFoundException {
-        User user = userRepository.findById(username).orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
+    public ArtistDto createArtist(ArtistDto artistDto) throws NameDuplicateException, ResourceNotFoundException {
 
         Iterable<Artist> Artists = artistRepository.findAll();
         for (Artist artist : Artists) {
@@ -31,11 +30,6 @@ public class ArtistService {
             }
         }
         Artist artist = transferArtistDtoToArtist(artistDto);
-
-        artist.setUser(user);
-        user.getArtistList().add(artist);
-
-        userRepository.save(user);
         artist = artistRepository.save(artist);
         return transferArtistToArtistDto(artist);
     }

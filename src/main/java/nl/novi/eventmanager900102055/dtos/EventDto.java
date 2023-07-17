@@ -3,8 +3,13 @@ package nl.novi.eventmanager900102055.dtos;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import nl.novi.eventmanager900102055.models.Artist;
+import nl.novi.eventmanager900102055.models.Location;
+import nl.novi.eventmanager900102055.models.Ticket;
+import nl.novi.eventmanager900102055.models.User;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class EventDto {
     private Long id;
@@ -16,6 +21,10 @@ public class EventDto {
     private Integer availability;
     @Min(0)
     private Integer ticketsSold;
+    private Location location;
+    private List<Artist> artistList;
+
+    private List<Ticket> ticketList;
 
     public EventDto() {
     }
@@ -58,5 +67,29 @@ public class EventDto {
 
     public void setTicketsSold(Integer ticketsSold) {
         this.ticketsSold = ticketsSold;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    public List<Ticket> getTicketList() {
+        return ticketList;
+    }
+
+    public void setTicketList(List<Ticket> ticketList) {
+        this.ticketList = ticketList;
+    }
+
+    public List<Artist> getArtistList() {
+        return artistList;
+    }
+
+    public void setArtistList(List<Artist> artistList) {
+        this.artistList = artistList;
     }
 }
