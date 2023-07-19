@@ -44,35 +44,37 @@ public class SpringSecurityConfig {
                 .and()
                 .build();
     }
+
     // Authorizatie met jwt
     @Bean
-    protected SecurityFilterChain filter (HttpSecurity http) throws Exception {
+    protected SecurityFilterChain filter(HttpSecurity http) throws Exception {
 
         http
                 .httpBasic().disable()
                 .cors().and()
                 .authorizeHttpRequests()
 
-                // Wanneer je deze uncomments, staat je hele security open. Je hebt dan alleen nog een jwt nodig.
-                .requestMatchers("/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                // Uncomment for developer mode
+//                .requestMatchers("/**").permitAll()
+//                .requestMatchers(HttpMethod.POST, "/users").permitAll()
 
                 .requestMatchers("/authenticate").permitAll()
                 .requestMatchers("/authenticated").authenticated()
 
-                .requestMatchers(HttpMethod.GET, "/users/**", "/events/**", "/tickets/**").hasAnyRole("ADMIN", "USER")
-                .requestMatchers(HttpMethod.POST, "/events/**", "/tickets/**").hasAnyRole("ADMIN", "USER")
-                .requestMatchers(HttpMethod.PUT, "/users/**", "/events/**", "/tickets/**").hasAnyRole("ADMIN", "USER")
-                .requestMatchers(HttpMethod.DELETE, "/users/**", "/events/**", "/tickets/**").hasAnyRole("ADMIN", "USER")
+                .requestMatchers("/artists/**", "/transactions/**", "/locations/**")
+                .hasRole("ADMIN")
 
-                .requestMatchers(HttpMethod.GET, "/users/**", "/transactions/**", "/events/**", "/locations/**", "/artists/**", "/tickets/**")
-                .hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/users/**", "/transactions/**", "/events/**", "/locations/**", "/artists/**", "/tickets/**")
-                .hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/users/**", "/transactions/**", "/events/**", "/locations/**", "/artists/**", "/tickets/**")
-                .hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/users/**", "/transactions/**", "/events/**", "/locations/**", "/artists/**", "/tickets/**")
-                .hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/events/find_all_events", "/events/*").hasAnyRole("ADMIN", "USER")
+                .requestMatchers(HttpMethod.GET, "/users/**", "/tickets/**", "/events/**").hasAnyRole("ADMIN")
+
+                .requestMatchers(HttpMethod.POST, "/users/create_user", "/tickets/create_ticket", "/tickets/tickets_user", "/events/find_event_by_name").hasAnyRole("ADMIN", "USER")
+                .requestMatchers(HttpMethod.POST, "/users/**", "/tickets/**", "/events/**").hasAnyRole("ADMIN")
+
+                .requestMatchers(HttpMethod.PUT, "/users/update_user").hasAnyRole("ADMIN", "USER")
+                .requestMatchers(HttpMethod.PUT, "/users/**", "/tickets/**", "/events/**").hasAnyRole("ADMIN")
+
+                .requestMatchers(HttpMethod.DELETE, "/users/delete_user").hasAnyRole("ADMIN", "USER")
+                .requestMatchers(HttpMethod.DELETE, "/users/**", "/tickets/**", "/events/**").hasAnyRole("ADMIN")
 
                 .anyRequest().denyAll()
                 .and()

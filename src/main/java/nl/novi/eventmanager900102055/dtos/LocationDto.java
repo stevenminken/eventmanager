@@ -23,8 +23,6 @@ public class LocationDto {
     @Min(10)
     private Integer numberOfSeats;
 
-    private User user;
-
     private List<Event> eventList;
 
     public LocationDto() {
@@ -68,14 +66,6 @@ public class LocationDto {
 
     public void setNumberOfSeats(Integer numberOfSeats) {
         this.numberOfSeats = numberOfSeats;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public List<Event> getEventList() {

@@ -25,8 +25,8 @@ public class LocationController {
         this.locationService = locationService;
     }
 
-    @PostMapping("/{username}")
-    public ResponseEntity<Object> createLocation(@Valid @RequestBody LocationDto locationDto, BindingResult bindingResult, @PathVariable("username") String username) throws NameDuplicateException, ResourceNotFoundException {
+    @PostMapping("/create_location")
+    public ResponseEntity<Object> createLocation(@Valid @RequestBody LocationDto locationDto, BindingResult bindingResult) throws NameDuplicateException, ResourceNotFoundException {
 
         if (bindingResult.hasFieldErrors()) {
             StringBuilder sb = new StringBuilder();
@@ -37,7 +37,7 @@ public class LocationController {
             }
             return ResponseEntity.badRequest().body(sb.toString());
         } else {
-            LocationDto dto = locationService.createLocation(locationDto, username);
+            LocationDto dto = locationService.createLocation(locationDto);
             URI location = UriComponentsBuilder
                     .fromPath("/locations/{lastName}")
                     .buildAndExpand(dto.getName())
@@ -47,7 +47,7 @@ public class LocationController {
         }
     }
 
-    @GetMapping
+    @GetMapping(value = "/find_all_locations")
     public ResponseEntity<List<LocationDto>> findAllLocations() {
         List<LocationDto> locationDtoList;
         locationDtoList = locationService.findAllLocations();
@@ -65,7 +65,7 @@ public class LocationController {
         }
     }
 
-    @PostMapping
+    @PostMapping(value = "/find_location_by_name")
     public ResponseEntity<Object> findLocationByName(@RequestBody Map<String, Object> requestBody) {
         try {
             LocationDto locationDto = locationService.findLocationByName(requestBody.get("name").toString());

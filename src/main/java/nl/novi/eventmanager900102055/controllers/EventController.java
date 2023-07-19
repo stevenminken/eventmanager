@@ -12,6 +12,9 @@ import nl.novi.eventmanager900102055.exceptions.ResourceNotFoundException;
 import nl.novi.eventmanager900102055.services.EventService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -33,8 +36,8 @@ public class EventController {
         this.objectMapper = objectMapper;
     }
 
-    @PostMapping("/{username}")
-    public ResponseEntity<Object> createEvent(@Valid @RequestBody EventDto EventDto, BindingResult bindingResult, @PathVariable("username") String username) throws NameDuplicateException, ResourceNotFoundException {
+    @PostMapping(value = "create_event")
+    public ResponseEntity<Object> createEvent(@Valid @RequestBody EventDto EventDto, BindingResult bindingResult) throws NameDuplicateException, ResourceNotFoundException {
 
         if (bindingResult.hasFieldErrors()) {
             StringBuilder sb = new StringBuilder();
@@ -45,7 +48,7 @@ public class EventController {
             }
             return ResponseEntity.badRequest().body(sb.toString());
         } else {
-            EventDto dto = eventService.createEvent(EventDto, username);
+            EventDto dto = eventService.createEvent(EventDto);
             URI location = UriComponentsBuilder
                     .fromPath("/Events/{lastName}")
                     .buildAndExpand(dto.getName())
@@ -55,19 +58,19 @@ public class EventController {
         }
     }
 
-    @GetMapping
+    @GetMapping(value = "find_all_events")
     public ResponseEntity<Object> findAllEvents() {
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         objectMapper.configure(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS, true);
 
         List<EventDto> eventDtoList = eventService.findAllEvents();
-        try {
-            String json = objectMapper.writeValueAsString(eventDtoList);
-            return ResponseEntity.ok().body(json);
-        } catch (JsonProcessingException e) {
-            String errorMessage = "Error occurred while serializing event data: " + e.getMessage();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
-        }
+//        try {
+//            String json = objectMapper.writeValueAsString(eventDtoList);
+            return ResponseEntity.ok().body(eventDtoList);
+//        } catch (JsonProcessingException e) {
+//            String errorMessage = "Error occurred while serializing event data: " + e.getMessage();
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+//        }
     }
 
 
@@ -82,7 +85,7 @@ public class EventController {
         }
     }
 
-    @PostMapping
+    @PostMapping(value = "/find_event_by_name")
     public ResponseEntity<Object> findEventByName(@RequestBody Map<String, Object> requestBody) {
         try {
             EventDto EventDto = eventService.findEventByName(requestBody.get("name").toString());
@@ -109,8 +112,10 @@ public class EventController {
         }
     }
 
-    @PostMapping("/add_location")
+    @PostMapping(value = "/add_location")
     public ResponseEntity<Object> addLocationToEvent(@RequestBody Map<String, Object> requestBody) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
         try {
             Long eventId = Long.parseLong(requestBody.get("eventId").toString());
             Long locationId = Long.parseLong(requestBody.get("locationId").toString());
@@ -126,7 +131,7 @@ public class EventController {
         }
     }
 
-    @PostMapping("/add_artist")
+    @PostMapping(value = "/add_artist")
     public ResponseEntity<Object> addArtistToEvent(@RequestBody Map<String, Object> requestBody) {
         try {
             Long eventId = Long.parseLong(requestBody.get("eventId").toString());

@@ -22,8 +22,7 @@ public class LocationService {
         this.userRepository = userRepository;
     }
 
-    public LocationDto createLocation(LocationDto locationDto, String username) throws NameDuplicateException, ResourceNotFoundException {
-        User user = userRepository.findById(username).orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
+    public LocationDto createLocation(LocationDto locationDto) throws NameDuplicateException, ResourceNotFoundException {
 
         Iterable<Location> locations = locationRepository.findAll();
         for (Location l : locations) {
@@ -33,10 +32,6 @@ public class LocationService {
         }
         Location location = transferLocationDtoToLocation(locationDto);
 
-        location.setUser(user);
-        user.getLocationList().add(location);
-
-        userRepository.save(user);
         location = locationRepository.save(location);
         return transferLocationToLocationDto(location);
     }
@@ -97,6 +92,7 @@ public class LocationService {
         location.setAddress(locationDto.getAddress());
         location.setEmail(locationDto.getEmail());
         location.setNumberOfSeats(locationDto.getNumberOfSeats());
+        location.setEventList(locationDto.getEventList());
 
         return location;
     }
@@ -109,6 +105,7 @@ public class LocationService {
         locationDto.setAddress(location.getAddress());
         locationDto.setEmail(location.getEmail());
         locationDto.setNumberOfSeats(location.getNumberOfSeats());
+        locationDto.setEventList(location.getEventList());
 
         return locationDto;
     }

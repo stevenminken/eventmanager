@@ -1,10 +1,9 @@
 package nl.novi.eventmanager900102055.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -19,14 +18,19 @@ public class Event {
     private Integer availability;
     @Column(name = "tickets_sold")
     private Integer ticketsSold;
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "location_id")
     private Location location;
     @ManyToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "artist_list")
+    @JoinTable(name = "event_artist",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "artist_id"))
     private List<Artist> artistList;
     @OneToMany(mappedBy = "event")
+    @Column(name = "ticket_list")
     private List<Ticket> ticketList;
+
 
     public Event() {
     }
@@ -102,8 +106,12 @@ public class Event {
         this.ticketList = ticketList;
     }
 
-    public String getDetails() {
-        return "details";
+    @Override
+    public String toString() {
+        return "Event{" +
+                "name='" + name + '\'' +
+                ", date=" + date +
+                ", location=" + location +
+                '}';
     }
-
 }

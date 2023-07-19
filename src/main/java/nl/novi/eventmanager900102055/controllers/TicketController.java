@@ -29,7 +29,7 @@ public class TicketController {
         this.objectMapper = objectMapper;
     }
 
-    @PostMapping
+    @PostMapping(value = "/create_ticket")
     public ResponseEntity<Object> createTicket(@RequestBody Map<String, Object> requestBody) throws ResourceNotFoundException, TicketsSoldOutException {
         long eventId = Long.parseLong(requestBody.get("eventId").toString());
         String username = requestBody.get("username").toString();
@@ -48,7 +48,7 @@ public class TicketController {
         return ResponseEntity.created(location).body("Ticket created: with id: " + +dto.getId());
     }
 
-    @GetMapping
+    @GetMapping(value = "/find_all_tickets")
     public ResponseEntity<Object> findAllTickets() {
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         objectMapper.configure(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS, true);
@@ -64,7 +64,7 @@ public class TicketController {
     }
 
 
-    @PostMapping("/usertickets")
+    @PostMapping(value = "/tickets_user")
     public ResponseEntity<Object> findUserTickets(@RequestBody Map<String, Object>  requestBody) {
         try {
             List<TicketDto> ticketDtoList = ticketService.findUserTickets(requestBody.get("userId").toString());

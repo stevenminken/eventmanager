@@ -57,7 +57,10 @@ public class Transaction {
         this.ticket = ticket;
     }
 
-    public String getDetails() {
-        return "details";
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "dateOfPurchase=" + dateOfPurchase +
+                '}';
     }
 }

@@ -2,15 +2,18 @@ package nl.novi.eventmanager900102055.dtos;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import nl.novi.eventmanager900102055.models.Event;
+import nl.novi.eventmanager900102055.models.Transaction;
+import nl.novi.eventmanager900102055.models.User;
 
 public class TicketDto {
     private Long id;
     @NotNull
-    private UserDto userDto;
+    private User user;
     @NotNull
-    private EventDto eventDto;
+    private Event event;
     @NotNull
-    private TransactionDto transactionDto;
+    private Transaction transaction;
     @Min(0)
     private Double price;
 
@@ -25,28 +28,28 @@ public class TicketDto {
         this.id = id;
     }
 
-    public UserDto getUserDto() {
-        return userDto;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserDto(UserDto userDto) {
-        this.userDto = userDto;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public EventDto getEventDto() {
-        return eventDto;
+    public Event getEvent() {
+        return event;
     }
 
-    public void setEventDto(EventDto eventDto) {
-        this.eventDto = eventDto;
+    public void setEvent(Event event) {
+        this.event = event;
     }
 
-    public TransactionDto getTransactionDto() {
-        return transactionDto;
+    public Transaction getTransaction() {
+        return transaction;
     }
 
-    public void setTransactionDto(TransactionDto transactionDto) {
-        this.transactionDto = transactionDto;
+    public void setTransaction(Transaction transaction) {
+        this.transaction = transaction;
     }
 
     public Double getPrice() {

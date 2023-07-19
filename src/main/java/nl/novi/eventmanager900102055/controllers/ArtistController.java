@@ -25,7 +25,7 @@ public class ArtistController {
         this.artistService = artistService;
     }
 
-    @PostMapping("/create_artist")
+    @PostMapping(value = "/create_artist")
     public ResponseEntity<Object> createArtist(@Valid @RequestBody ArtistDto ArtistDto, BindingResult bindingResult) throws NameDuplicateException, ResourceNotFoundException {
 
         if (bindingResult.hasFieldErrors()) {
@@ -47,7 +47,7 @@ public class ArtistController {
         }
     }
 
-    @GetMapping
+    @GetMapping(value = "/find_all_artists")
     public ResponseEntity<List<ArtistDto>> findAllArtists() {
         List<ArtistDto> ArtistDtoList;
         ArtistDtoList = artistService.findAllArtists();
@@ -65,7 +65,7 @@ public class ArtistController {
         }
     }
 
-    @PostMapping
+    @PostMapping(value = "/find_artist_by_name")
     public ResponseEntity<Object> findArtistByName(@RequestBody Map<String, Object> requestBody) {
         try {
             ArtistDto EventDto = artistService.findArtistByName(requestBody.get("name").toString());

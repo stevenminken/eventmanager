@@ -27,6 +27,7 @@ public class UserService {
     }
 
     public String createUser(UserDto userDto) throws NameDuplicateException, ResourceNotFoundException {
+
         Iterable<User> users = userRepository.findAll();
         for (User user : users) {
             if (user.getUsername().equals(userDto.getUsername())) {
@@ -42,6 +43,7 @@ public class UserService {
 
         User user = transferUserDtoToUser(userDto);
         user = userRepository.save(user);
+
         addAuthority(user.getUsername(), "ROLE_USER");
         return user.getUsername();
     }
@@ -126,16 +128,29 @@ public class UserService {
         user.setEnabled(userDto.getEnabled());
         user.setApikey(userDto.getApikey());
         user.setEmail(userDto.getEmail());
+        user.setTicketList(userDto.getTicketList());
 
         return user;
     }
 
     public UserDto transferUserToUserDto(User user) {
         UserDto userDto = new UserDto();
-        userDto.setUsername(user.getUsername());
-        userDto.setEmail(user.getEmail());
-        userDto.setAuthorities(user.getAuthorities());
+        for (Authority auth : user.getAuthorities()) {
+            if (auth.getAuthority().equals("ROLE_ADMIN")) {
+                userDto.setUsername(user.getUsername());
+                userDto.setEmail(user.getEmail());
+                userDto.setAuthorities(user.getAuthorities());
+                userDto.setTicketList(user.getTicketList());
+                break;
+            } else {
+                userDto.setUsername(user.getUsername());
+                userDto.setEmail(user.getEmail());
+                userDto.setTicketList(user.getTicketList());
+            }
+        }
         return userDto;
+//        if (auth.getPrincipal() instanceof UserDetails) {
+//            UserDetails ud = (UserDetails) auth.getPrincipal();
+//            return ResponseEntity.status(HttpStatus.CONFLICT).body("You can't do that now crazy " + ud.getUsername() + " You are a " + ud.getAuthorities());
     }
-
 }

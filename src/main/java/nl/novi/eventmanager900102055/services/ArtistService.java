@@ -85,6 +85,7 @@ public class ArtistService {
         artist.setId(artistDto.getId());
         artist.setName(artistDto.getName());
         artist.setGenre(artistDto.getGenre());
+        artist.setEventList(artistDto.getEventList());
 
         return artist;
     }
@@ -95,6 +96,7 @@ public class ArtistService {
         artistDto.setId(artist.getId());
         artistDto.setName(artist.getName());
         artistDto.setGenre(artist.getGenre());
+        artistDto.setEventList(artist.getEventList());
 
         return artistDto;
     }

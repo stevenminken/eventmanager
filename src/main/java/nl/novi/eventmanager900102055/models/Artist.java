@@ -15,9 +15,10 @@ public class Artist {
 
     private String name;
     private String genre;
+
     @JsonIgnore
     @ManyToMany(mappedBy = "artistList")
-    private List<Event> events;
+    private List<Event> eventList;
 
     public Artist() {
     }
@@ -51,16 +52,19 @@ public class Artist {
         this.genre = genre;
     }
 
-    public List<Event> getEvents() {
-        return events;
+    public List<Event> getEventList() {
+        return eventList;
     }
 
-    public void setEvents(List<Event> events) {
-        this.events = events;
+    public void setEventList(List<Event> eventList) {
+        this.eventList = eventList;
     }
 
-    public String getDetails() {
-        return "details";
+    @Override
+    public String toString() {
+        return "Artist{" +
+                "name='" + name + '\'' +
+                ", genre='" + genre + '\'' +
+                '}';
     }
-
 }

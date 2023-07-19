@@ -1,6 +1,5 @@
 package nl.novi.eventmanager900102055.services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.novi.eventmanager900102055.dtos.EventDto;
 import nl.novi.eventmanager900102055.exceptions.NameDuplicateException;
 import nl.novi.eventmanager900102055.exceptions.ResourceNotFoundException;
@@ -16,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class EventService {
@@ -31,8 +31,7 @@ public class EventService {
         this.artistRepository = artistRepository;
     }
 
-    public EventDto createEvent(EventDto eventDto, String username) throws NameDuplicateException, ResourceNotFoundException {
-        User user = userRepository.findById(username).orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
+    public EventDto createEvent(EventDto eventDto) throws NameDuplicateException {
 
         Iterable<Event> events = eventRepository.findAll();
         for (Event event : events) {
@@ -42,7 +41,6 @@ public class EventService {
         }
         Event event = transferEventDtoToEvent(eventDto);
 
-        userRepository.save(user);
         event = eventRepository.save(event);
         return transferEventToEventDto(event);
     }
@@ -87,6 +85,8 @@ public class EventService {
         }
         event.setLocation(location);
         eventRepository.save(event);
+        location.getEventList().add(event);
+        locationRepository.save(location);
         return true;
     }
 
@@ -98,24 +98,33 @@ public class EventService {
         }
         event.getArtistList().add(artist);
         eventRepository.save(event);
+        artist.getEventList().add(event);
+        artistRepository.save(artist);
         return true;
     }
 
-    public boolean deleteEvent(Long id) {
-        if (eventRepository.existsById(id)) {
-            eventRepository.deleteById(id);
+    public boolean deleteEvent(Long eventId) {
+        if (eventRepository.existsById(eventId)) {
+            Event event = eventRepository.findById(eventId).orElse(null);
+            assert event != null;
+            List<Artist> artists = event.getArtistList();
+
+            for (Artist artist : artists) {
+                artist.getEventList().removeIf(eventArtist -> event.getId().equals(eventId));
+                artistRepository.save(artist);
+            }
+
+            eventRepository.deleteById(eventId);
             return true;
         }
         return false;
     }
 
     public List<EventDto> transferEventListToEventDtoList(List<Event> eventList) {
-        List<EventDto> eventDtoList = new ArrayList<>();
 
-        for (Event event : eventList) {
-            eventDtoList.add(transferEventToEventDto(event));
-        }
-        return eventDtoList;
+        return eventList.stream()
+                .map(this::transferEventToEventDto)
+                .collect(Collectors.toList());
     }
 
     public Event transferEventDtoToEvent(EventDto eventDto) {

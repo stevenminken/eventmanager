@@ -1,5 +1,6 @@
 package nl.novi.eventmanager900102055.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
@@ -33,12 +34,10 @@ public class User {
             orphanRemoval = true,
             fetch = FetchType.EAGER)
     private Set<Authority> authorities = new HashSet<>();
+
     @OneToMany(mappedBy = "user")
     @Column(name = "ticket_list")
     private List<Ticket> ticketList;
-    @OneToMany(mappedBy = "user")
-    @Column(name = "location_list")
-    private List<Location> locationList;
 
     public String getUsername() {
         return username;
@@ -100,15 +99,15 @@ public class User {
         this.ticketList = ticketList;
     }
 
-    public List<Location> getLocationList() {
-        return locationList;
-    }
-
-    public void setLocationList(List<Location> locationList) {
-        this.locationList = locationList;
-    }
-
     public void setAuthorities(Set<Authority> authorities) {
         this.authorities = authorities;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                '}';
     }
 }

@@ -2,6 +2,8 @@ package nl.novi.eventmanager900102055.dtos;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import nl.novi.eventmanager900102055.models.*;
 
 import java.util.HashSet;
@@ -9,19 +11,18 @@ import java.util.List;
 import java.util.Set;
 
 public class UserDto {
-//    @NotEmpty
-//    @Size(min = 2, message = "user name should have at least 2 characters")
+    @NotEmpty
+    @Size(min = 2, message = "user name should have at least 2 characters")
     private String username;
-//    @NotEmpty
-//    @Size(min = 8, message = "password should have at least 8 characters")
+    @NotEmpty
+    @Size(min = 8, message = "password should have at least 8 characters")
     private String password;
     private Boolean enabled;
     private String apikey;
-//    @NotEmpty
+    @NotEmpty
     private String email;
     private Set<Authority> authorities;
     private List<Ticket> ticketList;
-    private List<Location> locationList;
 
     public String getUsername() {
         return username;
@@ -77,14 +78,6 @@ public class UserDto {
 
     public void setTicketList(List<Ticket> ticketList) {
         this.ticketList = ticketList;
-    }
-
-    public List<Location> getLocationList() {
-        return locationList;
-    }
-
-    public void setLocationList(List<Location> locationList) {
-        this.locationList = locationList;
     }
 
 }

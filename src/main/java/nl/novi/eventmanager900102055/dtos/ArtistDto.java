@@ -14,7 +14,7 @@ public class ArtistDto {
     private String name;
     @NotEmpty
     private String genre;
-    private List<Event> events;
+    private List<Event> eventList;
 
     public ArtistDto() {
     }
@@ -39,12 +39,12 @@ public class ArtistDto {
         return genre;
     }
 
-    public List<Event> getEvents() {
-        return events;
+    public List<Event> getEventList() {
+        return eventList;
     }
 
-    public void setEvents(List<Event> events) {
-        this.events = events;
+    public void setEventList(List<Event> eventList) {
+        this.eventList = eventList;
     }
 
     public void setGenre(String genre) {

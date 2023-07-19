@@ -49,8 +49,8 @@ public class TicketService {
                 Ticket ticket = new Ticket(user, event, price);
                 event.setAvailability(event.getAvailability() - 1);
                 event.setTicketsSold(event.getTicketsSold() + 1);
-                event.getTicketList().add(ticket);
-                user.getTicketList().add(ticket);
+//                event.getTicketList().add(ticket);
+//                user.getTicketList().add(ticket);
 
                 Transaction transaction = new Transaction();
                 transaction.setDateOfPurchase(LocalDate.now());
@@ -60,8 +60,10 @@ public class TicketService {
 
                 userRepository.save(user);
                 eventRepository.save(event);
+                ticketRepository.save(ticket);
 
                 return transferTicketToTicketDto(ticketRepository.save(ticket));
+
             } else {
                 throw new TicketsSoldOutException("Tickets sold out");
             }
@@ -142,7 +144,6 @@ public class TicketService {
 
         for (Ticket ticket : ticketList) {
             ticketDtoList.add(transferTicketToTicketDto(ticket));
-
         }
         return ticketDtoList;
     }
@@ -165,10 +166,11 @@ public class TicketService {
         ticketDto.setId(ticket.getId());
         ticketDto.setPrice(ticket.getPrice());
 
-        ticketDto.setEventDto(eventService.transferEventToEventDto(ticket.getEvent()));
-        ticketDto.setTransactionDto(transactionService.transferTransactionToTransactionDto(ticket.getTransaction()));
-        ticketDto.setUserDto(userService.transferUserToUserDto(ticket.getUser()));
+        ticketDto.setEvent(ticket.getEvent());
+        ticketDto.setTransaction(ticket.getTransaction());
+        ticketDto.setUser(ticket.getUser());
 
         return ticketDto;
     }
 }
+

@@ -71,7 +71,12 @@ public class Ticket {
         this.user = user;
     }
 
-    public String getDetails() {
-        return "details";
+    @Override
+    public String toString() {
+        return "Ticket{" +
+                "event=" + event +
+                ", user=" + user +
+                ", price=" + price +
+                '}';
     }
 }

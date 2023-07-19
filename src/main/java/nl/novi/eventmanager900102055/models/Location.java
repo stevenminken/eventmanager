@@ -1,6 +1,7 @@
 package nl.novi.eventmanager900102055.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -21,11 +22,8 @@ public class Location {
 
     @Column(name = "number_of_seats")
     private Integer numberOfSeats;
-    @JsonIgnore
-    @ManyToOne
-    private User user;
-    @JsonIgnore
-    @OneToMany(mappedBy = "location")
+    @JsonManagedReference
+    @OneToMany(mappedBy = "location", cascade = CascadeType.ALL)
     private List<Event> eventList;
 
     public Location() {
@@ -78,23 +76,20 @@ public class Location {
         this.numberOfSeats = numberOfSeats;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
     public List<Event> getEventList() {
         return eventList;
     }
 
-    public void setEvents(List<Event> eventList) {
+    public void setEventList(List<Event> eventList) {
         this.eventList = eventList;
     }
 
-    public String getDetails() {
-        return "details";
+    @Override
+    public String toString() {
+        return "Location{" +
+                "name='" + name + '\'' +
+                ", address='" + address + '\'' +
+                ", email='" + email + '\'' +
+                '}';
     }
 }
