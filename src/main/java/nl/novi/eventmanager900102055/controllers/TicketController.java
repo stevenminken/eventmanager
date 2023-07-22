@@ -60,10 +60,9 @@ public class TicketController {
             return ResponseEntity.ok().body(json);
         } catch (JsonProcessingException e) {
             String errorMessage = "Error occurred while serializing ticket data: " + e.getMessage();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
         }
     }
-
 
     @PostMapping(value = "/tickets_user")
     public ResponseEntity<Object> findUserTickets(@RequestBody Map<String, Object>  requestBody) {
@@ -72,7 +71,7 @@ public class TicketController {
             return ResponseEntity.ok().body(ticketDtoList);
         } catch (Exception e) {
             String errorMessage = "Error occurred while fetching the tickets: " + e.getMessage();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
         }
     }
 
@@ -83,7 +82,7 @@ public class TicketController {
             return ResponseEntity.ok().body(TicketDto);
         } catch (Exception e) {
             String errorMessage = "Error occurred while fetching the ticket: " + e.getMessage();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
         }
     }
 
@@ -91,9 +90,9 @@ public class TicketController {
     public ResponseEntity<Object> deleteTicket(@PathVariable("id") Long id) {
         boolean deleted = ticketService.deleteTicket(id);
         if (deleted) {
-            return ResponseEntity.ok().body("Ticket deleted");
+            return ResponseEntity.ok("Ticket deleted");
         } else {
-            return ResponseEntity.badRequest().body("Ticket not deleted");
+            return ResponseEntity.notFound().build();
         }
     }
 

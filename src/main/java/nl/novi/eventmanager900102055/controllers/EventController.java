@@ -75,7 +75,7 @@ public class EventController {
             return ResponseEntity.ok().body(eventDto);
         } catch (Exception e) {
             String errorMessage = "Error occurred while fetching the Event: " + e.getMessage();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
         }
     }
 
@@ -86,15 +86,15 @@ public class EventController {
             return ResponseEntity.ok().body(EventDto);
         } catch (Exception e) {
             String errorMessage = "Error occurred while fetching the Event: " + e.getMessage();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateEvent(@PathVariable("id") Long id, @Valid @RequestBody EventDto EventDto, BindingResult br) {
-        if (br.hasFieldErrors()) {
+    public ResponseEntity<Object> updateEvent(@PathVariable("id") Long id, @Valid @RequestBody EventDto EventDto, BindingResult bindingResult) {
+        if (bindingResult.hasFieldErrors()) {
             StringBuilder sb = new StringBuilder();
-            for (FieldError fe : br.getFieldErrors()) {
+            for (FieldError fe : bindingResult.getFieldErrors()) {
                 sb.append(fe.getField()).append(": ");
                 sb.append(fe.getDefaultMessage());
                 sb.append("/n");
@@ -121,7 +121,7 @@ public class EventController {
             }
         } catch (Exception e) {
             String errorMessage = "Error occurred while adding the location: " + e.getMessage();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
         }
     }
 
@@ -138,7 +138,7 @@ public class EventController {
             }
         } catch (Exception e) {
             String errorMessage = "Error occurred while adding the artist: " + e.getMessage();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
         }
     }
 
@@ -146,9 +146,9 @@ public class EventController {
     public ResponseEntity<Object> deleteEvent(@PathVariable("id") Long id) {
         boolean deleted = eventService.deleteEvent(id);
         if (deleted) {
-            return ResponseEntity.ok().body("Event deleted");
+            return ResponseEntity.ok("Event deleted");
         } else {
-            return ResponseEntity.badRequest().body("Event not deleted");
+            return ResponseEntity.notFound().build();
         }
     }
 

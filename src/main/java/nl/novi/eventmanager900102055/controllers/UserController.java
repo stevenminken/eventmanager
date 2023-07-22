@@ -11,6 +11,8 @@ import nl.novi.eventmanager900102055.models.User;
 import nl.novi.eventmanager900102055.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,10 +29,19 @@ public class UserController {
     }
 
     @PostMapping(value = "/create_user")
-    public ResponseEntity<String> createUser(@Valid @RequestBody UserDto dto) throws NameDuplicateException, ResourceNotFoundException {
-
-        String username = userService.createUser(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body("User created: " + username);
+    public ResponseEntity<String> createUser(@Valid @RequestBody UserDto dto, BindingResult bindingResult) throws NameDuplicateException, ResourceNotFoundException {
+        if (bindingResult.hasFieldErrors()) {
+            StringBuilder sb = new StringBuilder();
+            for (FieldError fe : bindingResult.getFieldErrors()) {
+                sb.append(fe.getField()).append(": ");
+                sb.append(fe.getDefaultMessage());
+                sb.append("\n");
+            }
+            return ResponseEntity.badRequest().body(sb.toString());
+        } else {
+            String username = userService.createUser(dto);
+            return ResponseEntity.status(HttpStatus.CREATED).body("User created: " + username);
+        }
     }
 
     @GetMapping(value = "/find_all_users")
@@ -48,15 +59,24 @@ public class UserController {
             return ResponseEntity.ok().body(optionalUser);
         } catch (Exception e) {
             String errorMessage = "Error occurred while fetching the user: " + e.getMessage();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
         }
     }
 
     @PutMapping(value = "/update_user")
-    public ResponseEntity<Object> updateUserPassword(@RequestBody UserDto userDto) throws ResourceNotFoundException {
-
-        userService.updateUserPassword(userDto);
-        return ResponseEntity.ok().body("User updated");
+    public ResponseEntity<Object> updateUserPassword(@RequestBody UserDto userDto, BindingResult bindingResult) throws ResourceNotFoundException {
+        if (bindingResult.hasFieldErrors()) {
+            StringBuilder sb = new StringBuilder();
+            for (FieldError fe : bindingResult.getFieldErrors()) {
+                sb.append(fe.getField()).append(": ");
+                sb.append(fe.getDefaultMessage());
+                sb.append("/n");
+            }
+            return ResponseEntity.badRequest().body(sb.toString());
+        } else {
+            userService.updateUserPassword(userDto);
+            return ResponseEntity.ok().body("User updated");
+        }
     }
 
     @DeleteMapping(value = "/delete_user")
@@ -104,9 +124,9 @@ public class UserController {
         String username = (String) fields.get("username");
         if (authorityName.equals("USER") || authorityName.equals("ADMIN")) {
             userService.removeAuthority(username, "ROLE_" + authorityName);
-            return ResponseEntity.ok().body("Authority deleted");
+            return ResponseEntity.ok("Authority deleted");
         } else {
-            return ResponseEntity.badRequest().body("Authority does not exist");
+            return ResponseEntity.notFound().build();
         }
     }
 
