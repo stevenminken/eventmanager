@@ -11,6 +11,7 @@ import nl.novi.eventmanager900102055.repositories.ArtistRepository;
 import nl.novi.eventmanager900102055.repositories.EventRepository;
 import nl.novi.eventmanager900102055.repositories.LocationRepository;
 import nl.novi.eventmanager900102055.repositories.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,13 +21,11 @@ import java.util.stream.Collectors;
 @Service
 public class EventService {
     private final EventRepository eventRepository;
-    private final UserRepository userRepository;
     private final LocationRepository locationRepository;
     private final ArtistRepository artistRepository;
 
-    public EventService(EventRepository eventRepository, UserRepository userRepository, LocationRepository locationRepository, ArtistRepository artistRepository) {
+    public EventService(EventRepository eventRepository, LocationRepository locationRepository, ArtistRepository artistRepository) {
         this.eventRepository = eventRepository;
-        this.userRepository = userRepository;
         this.locationRepository = locationRepository;
         this.artistRepository = artistRepository;
     }
@@ -52,7 +51,7 @@ public class EventService {
 
     public EventDto findEventById(Long id) {
         Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("event not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Event not found with ID: " + id));
         return transferEventToEventDto(event);
     }
 
@@ -155,5 +154,6 @@ public class EventService {
 
         return eventDto;
     }
+
 
 }

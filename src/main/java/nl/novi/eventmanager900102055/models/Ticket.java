@@ -19,7 +19,7 @@ public class Ticket {
     @ManyToOne
     private Event event;
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     public Ticket() {

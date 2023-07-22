@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -15,7 +16,6 @@ public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
     private String address;
     private String email;
@@ -29,11 +29,12 @@ public class Location {
     public Location() {
     }
 
-    public Location(String name, String address, String email, Integer numberOfSeats) {
+    public Location(String name, String address, String email, Integer numberOfSeats, List<Event> eventList) {
         this.name = name;
         this.address = address;
         this.email = email;
         this.numberOfSeats = numberOfSeats;
+        this.eventList = eventList;
     }
 
     public Long getId() {

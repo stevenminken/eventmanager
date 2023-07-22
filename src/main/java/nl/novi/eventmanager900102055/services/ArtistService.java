@@ -15,13 +15,11 @@ import java.util.List;
 @Service
 public class ArtistService {
     private final ArtistRepository artistRepository;
-    private final UserRepository userRepository;
 
-     public ArtistService(ArtistRepository artistRepository, UserRepository userRepository) {
+     public ArtistService(ArtistRepository artistRepository) {
             this.artistRepository = artistRepository;
-            this.userRepository = userRepository;
     }
-    public ArtistDto createArtist(ArtistDto artistDto) throws NameDuplicateException, ResourceNotFoundException {
+    public ArtistDto createArtist(ArtistDto artistDto) throws NameDuplicateException{
 
         Iterable<Artist> Artists = artistRepository.findAll();
         for (Artist artist : Artists) {

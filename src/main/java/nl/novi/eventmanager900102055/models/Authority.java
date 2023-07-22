@@ -3,6 +3,7 @@ package nl.novi.eventmanager900102055.models;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 @Entity
 @IdClass(AuthorityKey.class)
@@ -40,5 +41,23 @@ public class Authority implements Serializable {
     public void setAuthority(String authority) {
         this.authority = authority;
     }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Authority authority = (Authority) obj;
+        return Objects.equals(username, authority.username) &&
+                Objects.equals(this.authority, authority.authority);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(username, authority);
+    }
+
 
 }

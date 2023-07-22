@@ -64,13 +64,7 @@ public class EventController {
         objectMapper.configure(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS, true);
 
         List<EventDto> eventDtoList = eventService.findAllEvents();
-//        try {
-//            String json = objectMapper.writeValueAsString(eventDtoList);
-            return ResponseEntity.ok().body(eventDtoList);
-//        } catch (JsonProcessingException e) {
-//            String errorMessage = "Error occurred while serializing event data: " + e.getMessage();
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
-//        }
+        return ResponseEntity.ok().body(eventDtoList);
     }
 
 

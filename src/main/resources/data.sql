@@ -26,4 +26,5 @@ VALUES ('user', '$2y$10$1qCLmItB.xPIhd2h3MaIDelkS2dAi4COALzgtwjqOpTsYdc22R7cu', 
 
 INSERT INTO authorities (username, authority)
 VALUES ('user', 'ROLE_USER'),
-        ('admin', 'ROLE_ADMIN');
+        ('admin', 'ROLE_ADMIN'),
+        ('admin', 'ROLE_USER');

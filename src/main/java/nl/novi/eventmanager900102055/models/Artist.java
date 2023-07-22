@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -53,7 +54,10 @@ public class Artist {
     }
 
     public List<Event> getEventList() {
-        return eventList;
+        if (this.eventList == null) {
+            this.eventList = new ArrayList<>();
+        }
+        return this.eventList;
     }
 
     public void setEventList(List<Event> eventList) {

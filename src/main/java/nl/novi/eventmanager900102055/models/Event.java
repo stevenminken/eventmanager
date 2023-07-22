@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -26,7 +27,7 @@ public class Event {
     @JoinTable(name = "event_artist",
             joinColumns = @JoinColumn(name = "event_id"),
             inverseJoinColumns = @JoinColumn(name = "artist_id"))
-    private List<Artist> artistList;
+    private List<Artist> artistList = new ArrayList<>();
     @OneToMany(mappedBy = "event")
     @Column(name = "ticket_list")
     private List<Ticket> ticketList;

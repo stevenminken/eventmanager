@@ -42,8 +42,6 @@ public class UserService {
         userDto.setPassword(encodedPassword);
 
         User user = transferUserDtoToUser(userDto);
-        user = userRepository.save(user);
-
         addAuthority(user.getUsername(), "ROLE_USER");
         return user.getUsername();
     }
@@ -135,22 +133,10 @@ public class UserService {
 
     public UserDto transferUserToUserDto(User user) {
         UserDto userDto = new UserDto();
-        for (Authority auth : user.getAuthorities()) {
-            if (auth.getAuthority().equals("ROLE_ADMIN")) {
-                userDto.setUsername(user.getUsername());
-                userDto.setEmail(user.getEmail());
-                userDto.setAuthorities(user.getAuthorities());
-                userDto.setTicketList(user.getTicketList());
-                break;
-            } else {
-                userDto.setUsername(user.getUsername());
-                userDto.setEmail(user.getEmail());
-                userDto.setTicketList(user.getTicketList());
-            }
-        }
+        userDto.setUsername(user.getUsername());
+        userDto.setEmail(user.getEmail());
+        userDto.setAuthorities(user.getAuthorities());
+        userDto.setTicketList(user.getTicketList());
         return userDto;
-//        if (auth.getPrincipal() instanceof UserDetails) {
-//            UserDetails ud = (UserDetails) auth.getPrincipal();
-//            return ResponseEntity.status(HttpStatus.CONFLICT).body("You can't do that now crazy " + ud.getUsername() + " You are a " + ud.getAuthorities());
     }
 }

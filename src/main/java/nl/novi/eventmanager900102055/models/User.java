@@ -39,6 +39,14 @@ public class User {
     @Column(name = "ticket_list")
     private List<Ticket> ticketList;
 
+    public User(){}
+
+    public User(String username, String password, boolean enabled) {
+        this.username = username;
+        this.password = password;
+        this.enabled = enabled;
+    }
+
     public String getUsername() {
         return username;
     }
