@@ -31,8 +31,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(SpringExtension.class)
 @WebMvcTest(ArtistController.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
 public class ArtistControllerTest {
@@ -71,7 +71,6 @@ public class ArtistControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/Artists/Klaas%20Muziek"))
                 .andExpect(content().string("Artist created: Klaas Muziek with id: " + artistDto.getId()));
-
     }
 
     @Test

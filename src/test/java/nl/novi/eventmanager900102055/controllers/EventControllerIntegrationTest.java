@@ -112,7 +112,6 @@ public class EventControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.ticketsSold").value(0));
     }
 
-
     @Test
     @DisplayName("Find Event by Name with Valid Name - Should Return Event")
     public void testFindEventByName_WithValidName_ShouldReturnEvent() throws Exception {
@@ -132,7 +131,6 @@ public class EventControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.availability").value(2000))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.ticketsSold").value(0));
     }
-
 
     @Test
     @DisplayName("Update Event with Valid Data - Should Return Updated Event")
@@ -158,7 +156,6 @@ public class EventControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.ticketsSold").value(500));
     }
 
-
     @Test
     @DisplayName("Add Location to Event with Valid Data - Should Return Success Message")
     public void testAddLocationToEvent_WithValidData_ShouldReturnSuccessMessage() throws Exception {
@@ -179,7 +176,6 @@ public class EventControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.content().string("Location added"));
     }
 
-
     @Test
     @DisplayName("Add Artist to Event with Valid Data - Should Return Success Message")
     public void testAddArtistToEvent_WithValidData_ShouldReturnSuccessMessage() throws Exception {
@@ -199,7 +195,6 @@ public class EventControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string("Artist added"));
     }
-
 
     @Test
     @DisplayName("Delete Event with Valid Event ID - Should Return Success Message")

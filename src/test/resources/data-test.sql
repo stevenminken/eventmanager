@@ -20,10 +20,10 @@ INSERT INTO locations (name, address, email, number_of_seats) VALUES ('Beursgebo
 -- INSERT INTO users
 -- password = "password" (this comment is a security leak, never put plaintext passwords in your code.
 -- If you forget your plaintext password here, you have to set a new encrypted password.)
-INSERT INTO users (username, password, email, enabled) VALUES ('testuser', '$2y$10$1qCLmItB.xPIhd2h3MaIDelkS2dAi4COALzgtwjqOpTsYdc22R7cu', 'testuser@test.nl', TRUE);
-INSERT INTO users (username, password, email, enabled) VALUES ('testadmin', '$2y$10$rI7tyYAkN5NVTAGhfm661eN6ms.PQ.jAXpNkzCVdWopV19nhvJ6Ie', 'testadmin@test.nl', TRUE);
+INSERT INTO users (username, password, email, enabled) VALUES ('testuser123', '$2y$10$1qCLmItB.xPIhd2h3MaIDelkS2dAi4COALzgtwjqOpTsYdc22R7cu', 'testuser@test.nl', TRUE);
+INSERT INTO users (username, password, email, enabled) VALUES ('testadmin123', '$2y$10$rI7tyYAkN5NVTAGhfm661eN6ms.PQ.jAXpNkzCVdWopV19nhvJ6Ie', 'testadmin@test.nl', TRUE);
 
 -- INSERT INTO authorities
-INSERT INTO authorities (username, authority) VALUES ('testuser', 'ROLE_USER');
-INSERT INTO authorities (username, authority) VALUES ('testadmin', 'ROLE_ADMIN');
-INSERT INTO authorities (username, authority) VALUES ('testadmin', 'ROLE_USER');
+INSERT INTO authorities (username, authority) VALUES ('testuser12', 'ROLE_USER');
+INSERT INTO authorities (username, authority) VALUES ('testadmin123', 'ROLE_ADMIN');
+INSERT INTO authorities (username, authority) VALUES ('testadmin123', 'ROLE_USER');

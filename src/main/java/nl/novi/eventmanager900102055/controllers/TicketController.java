@@ -9,6 +9,7 @@ import nl.novi.eventmanager900102055.dtos.TicketDto;
 import nl.novi.eventmanager900102055.exceptions.ResourceNotFoundException;
 import nl.novi.eventmanager900102055.exceptions.TicketsSoldOutException;
 import nl.novi.eventmanager900102055.services.TicketService;
+import org.hibernate.Hibernate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,11 +42,11 @@ public class TicketController {
 
         TicketDto dto = ticketService.createTicket(eventId, username, price);
         URI location = UriComponentsBuilder
-                .fromPath("/Tickets/")
+                .fromPath("/Tickets/{id}")
                 .buildAndExpand(dto.getId())
                 .toUri();
 
-        return ResponseEntity.created(location).body("Ticket created: with id: " + +dto.getId());
+        return ResponseEntity.created(location).body("Ticket created: " + dto.getEvent().getName() + " with id: " + + dto.getId());
     }
 
     @GetMapping(value = "/find_all_tickets")
@@ -95,5 +96,6 @@ public class TicketController {
             return ResponseEntity.badRequest().body("Ticket not deleted");
         }
     }
+
 }
 

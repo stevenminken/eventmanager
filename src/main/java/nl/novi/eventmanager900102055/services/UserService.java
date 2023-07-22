@@ -42,6 +42,7 @@ public class UserService {
         userDto.setPassword(encodedPassword);
 
         User user = transferUserDtoToUser(userDto);
+        userRepository.save(user);
         addAuthority(user.getUsername(), "ROLE_USER");
         return user.getUsername();
     }
@@ -90,8 +91,8 @@ public class UserService {
     }
 
     public void addAuthority(String username, String authority) throws ResourceNotFoundException {
-        User user = userRepository.findById(username).orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
 
+        User user = userRepository.findById(username).orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
         user.addAuthority(new Authority(username, authority));
         userRepository.save(user);
     }

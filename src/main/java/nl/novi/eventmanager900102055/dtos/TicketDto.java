@@ -1,11 +1,11 @@
 package nl.novi.eventmanager900102055.dtos;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import nl.novi.eventmanager900102055.models.Event;
 import nl.novi.eventmanager900102055.models.Transaction;
 import nl.novi.eventmanager900102055.models.User;
-
 public class TicketDto {
     private Long id;
     @NotNull

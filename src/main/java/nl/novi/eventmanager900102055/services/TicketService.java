@@ -1,5 +1,6 @@
 package nl.novi.eventmanager900102055.services;
 
+import jakarta.transaction.Transactional;
 import nl.novi.eventmanager900102055.dtos.TicketDto;
 import nl.novi.eventmanager900102055.exceptions.ResourceNotFoundException;
 import nl.novi.eventmanager900102055.exceptions.TicketsSoldOutException;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TicketService {
@@ -49,8 +51,6 @@ public class TicketService {
                 Ticket ticket = new Ticket(user, event, price);
                 event.setAvailability(event.getAvailability() - 1);
                 event.setTicketsSold(event.getTicketsSold() + 1);
-//                event.getTicketList().add(ticket);
-//                user.getTicketList().add(ticket);
 
                 Transaction transaction = new Transaction();
                 transaction.setDateOfPurchase(LocalDate.now());
@@ -60,7 +60,6 @@ public class TicketService {
 
                 userRepository.save(user);
                 eventRepository.save(event);
-                ticketRepository.save(ticket);
 
                 return transferTicketToTicketDto(ticketRepository.save(ticket));
 
@@ -70,9 +69,10 @@ public class TicketService {
         }
     }
 
+    @Transactional
     public List<TicketDto> findAllTickets() {
-        List<Ticket> ticketList = ticketRepository.findAll();
-        return transferTicketListToTicketDtoList(ticketList);
+        List<Ticket> tickets = ticketRepository.findAll();
+        return tickets.stream().map(this::transferTicketToTicketDto).collect(Collectors.toList());
     }
 
     public List<TicketDto> findUserTickets(String userId) {
@@ -86,10 +86,10 @@ public class TicketService {
         return transferTicketListToTicketDtoList(userTicketList);
     }
 
-    public TicketDto findTicketById(Long id) {
-        Ticket ticket = ticketRepository.findById(id).orElse(null);
+    public TicketDto findTicketById(Long id) throws ResourceNotFoundException {
+        Ticket ticket = ticketRepository.findTicketByIdWithEagerFetch(id);
         if (ticket == null) {
-            return null;
+            throw new ResourceNotFoundException("Ticket not found with id: " + id);
         }
         return transferTicketToTicketDto(ticket);
     }
@@ -161,7 +161,6 @@ public class TicketService {
 
     public TicketDto transferTicketToTicketDto(Ticket ticket) {
         TicketDto ticketDto = new TicketDto();
-        System.out.println(ticket.getId());
 
         ticketDto.setId(ticket.getId());
         ticketDto.setPrice(ticket.getPrice());

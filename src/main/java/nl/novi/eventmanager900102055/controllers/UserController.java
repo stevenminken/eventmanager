@@ -29,9 +29,8 @@ public class UserController {
     @PostMapping(value = "/create_user")
     public ResponseEntity<String> createUser(@Valid @RequestBody UserDto dto) throws NameDuplicateException, ResourceNotFoundException {
 
-        String newUsername = userService.createUser(dto);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body("User created: " + newUsername);
+        String username = userService.createUser(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body("User created: " + username);
     }
 
     @GetMapping(value = "/find_all_users")
