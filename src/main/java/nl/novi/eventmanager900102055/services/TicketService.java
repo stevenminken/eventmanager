@@ -41,7 +41,7 @@ public class TicketService {
     public TicketDto createTicket(Long eventId, String username, Double price) throws ResourceNotFoundException, TicketsSoldOutException {
         User user = userRepository.findByUsername(username);
         if (user == null) {
-            throw new ResourceNotFoundException("User does not exist");
+            throw new ResourceNotFoundException("User not found");
         } else {
 
             Event event = eventRepository.findById(eventId)

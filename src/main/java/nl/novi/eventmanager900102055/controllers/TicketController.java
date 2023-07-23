@@ -46,7 +46,7 @@ public class TicketController {
                 .buildAndExpand(dto.getId())
                 .toUri();
 
-        return ResponseEntity.created(location).body("Ticket created: " + dto.getEvent().getName() + " with id: " + + dto.getId());
+        return ResponseEntity.created(location).body("Ticket created: " + dto.getEvent().getName() + " with id: " + dto.getId());
     }
 
     @GetMapping(value = "/find_all_tickets")

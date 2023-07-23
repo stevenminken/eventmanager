@@ -43,7 +43,7 @@ public class LocationController {
                     .buildAndExpand(dto.getName())
                     .toUri();
 
-            return ResponseEntity.created(location).body("location created: " + dto.getName() + " with id: " + +dto.getId());
+            return ResponseEntity.created(location).body("location created: " + dto.getName() + " with id: " + dto.getId());
         }
     }
 

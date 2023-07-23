@@ -3,8 +3,6 @@ package nl.novi.eventmanager900102055.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
-import java.util.List;
-
 @Entity
 @Table(name = "tickets")
 public class Ticket {

@@ -1,21 +1,21 @@
 package nl.novi.eventmanager900102055.dtos;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import nl.novi.eventmanager900102055.models.Artist;
 import nl.novi.eventmanager900102055.models.Location;
 import nl.novi.eventmanager900102055.models.Ticket;
 import nl.novi.eventmanager900102055.models.User;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.util.List;
 
 public class EventDto {
     private Long id;
-    @NotEmpty
+    @Size(min = 2, message = "name event should have at least 2 characters")
     private String name;
-    @NotNull
+    @NotNull(message = "Date cannot be null")
+    @DateTimeFormat(pattern = "yyyy-MM-dd") // Optional, specify the expected date format
     private LocalDate date;
     @Min(0)
     private Integer availability;

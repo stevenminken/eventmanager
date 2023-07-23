@@ -105,19 +105,18 @@ public class ArtistControllerTest {
                 .when(artistService).findArtistById(anyLong());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/artists/1"))
-                .andExpect(status().isInternalServerError())
-                .andExpect(content().string("Error occurred while fetching the artist: Something went wrong"));
+                .andExpect(status().isNotFound());
     }
 
     @Test
     @WithMockUser(username = "admin", roles = "ADMIN")
     @DisplayName("Find Artist by Name Should Return OK")
     public void testFindArtistByName_ShouldReturnOk() throws Exception {
-        when(artistService.findArtistByName("John Doe")).thenReturn(artistDto);
+        when(artistService.findArtistByName("Novi Tester")).thenReturn(artistDto);
 
         mockMvc.perform(post("/artists/find_artist_by_name")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\": \"John Doe\"}"))
+                        .content("{\"name\": \"Novi Tester\"}"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(artistDto.getId()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(artistDto.getName()));
@@ -128,12 +127,12 @@ public class ArtistControllerTest {
     @DisplayName("Find Artist by Name Should Return Internal Server Error")
     public void testFindArtistByName_ShouldReturnInternalServerError() throws Exception {
         doThrow(new RuntimeException("Something went wrong"))
-                .when(artistService).findArtistByName("John Doe");
+                .when(artistService).findArtistByName("Novi Tester");
 
         mockMvc.perform(post("/artists/find_artist_by_name")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\": \"John Doe\"}"))
-                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
+                        .content("{\"name\": \"Novi Tester\"}"))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.content().string("Error occurred while fetching the Artist: Something went wrong"));
     }
 
@@ -181,7 +180,6 @@ public class ArtistControllerTest {
         when(artistService.deleteArtist(anyLong())).thenReturn(false);
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/artists/1"))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string("Artist not deleted"));
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 }

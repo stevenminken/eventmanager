@@ -2,6 +2,8 @@ package nl.novi.eventmanager900102055.dtos;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import nl.novi.eventmanager900102055.models.Event;
 import nl.novi.eventmanager900102055.models.User;
 
@@ -10,7 +12,8 @@ import java.util.List;
 public class ArtistDto {
 
     private Long id;
-    @NotEmpty
+    @Pattern(regexp = "^[^0-9]+$", message = "Name cannot have digits")
+    @Size(min = 2, message = "name artist should have at least 2 characters")
     private String name;
     @NotEmpty
     private String genre;

@@ -3,10 +3,7 @@ package nl.novi.eventmanager900102055.dtos;
 import jakarta.persistence.Column;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import nl.novi.eventmanager900102055.models.Event;
 import nl.novi.eventmanager900102055.models.User;
 
@@ -14,11 +11,11 @@ import java.util.List;
 
 public class LocationDto {
     private Long id;
-    @NotEmpty
+    @Size(min = 2, message = "name location should have at least 2 characters")
     private String name;
 
     private String address;
-
+    @Email(message = "Invalid email format")
     private String email;
     @Min(10)
     private Integer numberOfSeats;

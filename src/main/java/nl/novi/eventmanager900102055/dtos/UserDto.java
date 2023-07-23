@@ -2,7 +2,9 @@ package nl.novi.eventmanager900102055.dtos;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import nl.novi.eventmanager900102055.models.*;
 
@@ -11,18 +13,27 @@ import java.util.List;
 import java.util.Set;
 
 public class UserDto {
-    @NotEmpty
-    @Size(min = 2, message = "user name should have at least 2 characters")
+
+    @Pattern(regexp = "^[^0-9]+$", message = "Name cannot have digits")
+    @Size(min = 2, message = "username should have at least 2 characters")
     private String username;
-    @NotEmpty
-    @Size(min = 8, message = "password should have at least 8 characters")
+    @Size(min = 4, max = 20, message = "Password must be between 4 and 20 characters")
     private String password;
     private Boolean enabled;
     private String apikey;
-    @NotEmpty
+    @NotEmpty(message = "Email cannot be empty")
+    @Email(message = "Invalid email format")
     private String email;
     private Set<Authority> authorities;
     private List<Ticket> ticketList;
+
+    public UserDto() {}
+
+    public UserDto(String username, String password, String email) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
 
     public String getUsername() {
         return username;

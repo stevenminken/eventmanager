@@ -1,6 +1,5 @@
 package nl.novi.eventmanager900102055.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
@@ -41,10 +40,10 @@ public class User {
 
     public User(){}
 
-    public User(String username, String password, boolean enabled) {
+    public User(String username, String password, String email) {
         this.username = username;
         this.password = password;
-        this.enabled = enabled;
+        this.email = email;
     }
 
     public String getUsername() {

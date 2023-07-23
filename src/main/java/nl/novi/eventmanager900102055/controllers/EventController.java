@@ -54,7 +54,7 @@ public class EventController {
                     .buildAndExpand(dto.getName())
                     .toUri();
 
-            return ResponseEntity.created(location).body("Event created: " + dto.getName() + " with id: " + +dto.getId());
+            return ResponseEntity.created(location).body("Event created: " + dto.getName() + " with id: " + dto.getId());
         }
     }
 

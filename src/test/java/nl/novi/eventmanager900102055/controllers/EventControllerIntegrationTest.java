@@ -12,6 +12,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -53,6 +55,7 @@ public class EventControllerIntegrationTest {
     }
 
     @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @DisplayName("Create Event with Valid Data - Should Create Event")
     public void testCreateEvent_WithValidData_ShouldCreateEvent() throws Exception {
 
@@ -68,6 +71,7 @@ public class EventControllerIntegrationTest {
     }
 
     @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @DisplayName("Find All Events - Should Return List of Events")
     public void testFindAllEvents_ShouldReturnListOfEvents() throws Exception {
 
@@ -98,6 +102,7 @@ public class EventControllerIntegrationTest {
     }
 
     @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @DisplayName("Find Event by ID with Valid ID - Should Return Event")
     public void testFindEventById_WithValidId_ShouldReturnEvent() throws Exception {
 
@@ -113,6 +118,7 @@ public class EventControllerIntegrationTest {
     }
 
     @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @DisplayName("Find Event by Name with Valid Name - Should Return Event")
     public void testFindEventByName_WithValidName_ShouldReturnEvent() throws Exception {
 
@@ -133,6 +139,7 @@ public class EventControllerIntegrationTest {
     }
 
     @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @DisplayName("Update Event with Valid Data - Should Return Updated Event")
     public void testUpdateEvent_WithValidData_ShouldReturnUpdatedEvent() throws Exception {
 
@@ -157,6 +164,7 @@ public class EventControllerIntegrationTest {
     }
 
     @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @DisplayName("Add Location to Event with Valid Data - Should Return Success Message")
     public void testAddLocationToEvent_WithValidData_ShouldReturnSuccessMessage() throws Exception {
 
@@ -177,6 +185,7 @@ public class EventControllerIntegrationTest {
     }
 
     @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @DisplayName("Add Artist to Event with Valid Data - Should Return Success Message")
     public void testAddArtistToEvent_WithValidData_ShouldReturnSuccessMessage() throws Exception {
 
@@ -197,6 +206,7 @@ public class EventControllerIntegrationTest {
     }
 
     @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @DisplayName("Delete Event with Valid Event ID - Should Return Success Message")
     public void testDeleteEvent_WithValidEventId_ShouldReturnSuccessMessage() throws Exception {
 

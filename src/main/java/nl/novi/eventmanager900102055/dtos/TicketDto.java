@@ -12,7 +12,7 @@ public class TicketDto {
     private User user;
     @NotNull
     private Event event;
-    @NotNull
+
     private Transaction transaction;
     @Min(0)
     private Double price;

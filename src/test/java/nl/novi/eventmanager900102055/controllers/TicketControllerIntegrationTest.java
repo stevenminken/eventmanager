@@ -38,8 +38,7 @@ public class TicketControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    private ObjectMapper objectMapper = new ObjectMapper();
+    final private ObjectMapper objectMapper = new ObjectMapper();
     Map<String, Object> newEvent;
     Map<String, Object> newUser;
     Long eventId;
@@ -70,9 +69,7 @@ public class TicketControllerIntegrationTest {
         newUser = new HashMap<>();
         newUser.put("username", "Melinda test");
         newUser.put("password", "random_password");
-        newUser.put("enabled", true);
         newUser.put("email", "info@email.com");
-        newUser.put("apikey", "random_api");
 
         mockMvc.perform(MockMvcRequestBuilders.post("/users/create_user")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -113,9 +110,11 @@ public class TicketControllerIntegrationTest {
         assertEquals("/Tickets/" + ticketId, ticketResponse.getHeader("Location"));
         assertEquals("Ticket created: Winterfestival with id: " + ticketId, ticketResponse.getContentAsString());
     }
+
     @Test
-    @DisplayName("Get All Tickets - Should Return All Tickets")
-    public void testGetAllTickets_ShouldReturnAllTickets() throws Exception {
+    @WithMockUser(username = "admin", roles = "ADMIN")
+    @DisplayName("Find All Tickets - Should Return All Tickets")
+    public void testFindAllTickets_ShouldReturnAllTickets() throws Exception {
         // create extra ticket
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("eventId", eventId);
@@ -126,25 +125,22 @@ public class TicketControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestBody)));
 
-        // Perform request
         MvcResult getResult = mockMvc.perform(MockMvcRequestBuilders.get("/tickets/find_all_tickets"))
                 .andReturn();
 
-        // Get the response content as a String
         String responseJson = getResult.getResponse().getContentAsString();
 
-        // Deserialize the JSON response using a CollectionType
         TypeFactory typeFactory = objectMapper.getTypeFactory();
         CollectionType listType = typeFactory.constructCollectionType(List.class, TicketDto.class);
         List<TicketDto> ticketList = objectMapper.readValue(responseJson, listType);
 
-        // Assert the number of tickets retrieved
         assertEquals(2, ticketList.size());
     }
 
     @Test
-    @DisplayName("Get User Tickets - Should Return User Tickets")
-    public void testGetUserTickets_ShouldReturnUserTickets() throws Exception {
+    @WithMockUser(username = "admin", roles = "ADMIN")
+    @DisplayName("Find User Tickets - Should Return User Tickets")
+    public void testFindUserTickets_ShouldReturnUserTickets() throws Exception {
 
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("userId", "Melinda test");
@@ -162,9 +158,11 @@ public class TicketControllerIntegrationTest {
 
         assertEquals(1, ticketList.size());
     }
+
     @Test
-    @DisplayName("Get Ticket by ID - Should Return Ticket")
-    public void testGetTicketById_ShouldReturnTicket() throws Exception {
+    @WithMockUser(username = "admin", roles = "ADMIN")
+    @DisplayName("Find Ticket by ID - Should Return Ticket")
+    public void testFindTicketById_ShouldReturnTicket() throws Exception {
         Long ticketIdToFetch = 1L;
 
         MvcResult getResult = mockMvc.perform(MockMvcRequestBuilders.get("/tickets/" + ticketIdToFetch))
@@ -176,7 +174,9 @@ public class TicketControllerIntegrationTest {
 
         assertEquals(ticketIdToFetch, ticketDto.getId());
     }
+
     @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @DisplayName("Delete Ticket by ID - Should Delete Ticket")
     public void testDeleteTicketById_ShouldDeleteTicket() throws Exception {
 
@@ -190,5 +190,4 @@ public class TicketControllerIntegrationTest {
 
         assertEquals("Ticket deleted", deleteResponse);
     }
-
 }
