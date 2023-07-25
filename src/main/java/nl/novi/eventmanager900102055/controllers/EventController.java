@@ -10,17 +10,19 @@ import nl.novi.eventmanager900102055.dtos.TicketDto;
 import nl.novi.eventmanager900102055.exceptions.NameDuplicateException;
 import nl.novi.eventmanager900102055.exceptions.ResourceNotFoundException;
 import nl.novi.eventmanager900102055.services.EventService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.IOException;
 import java.net.URI;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -150,6 +152,28 @@ public class EventController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @PostMapping("/{eventId}/upload_document")
+    public ResponseEntity<Object> uploadDocument(@PathVariable Long eventId, @RequestParam("file") MultipartFile file) {
+        try {
+            EventDto eventDto = eventService.uploadDocument(eventId, file);
+            return new ResponseEntity<>(eventDto, HttpStatus.OK);
+        } catch (ResourceNotFoundException | IOException e) {
+            return new ResponseEntity<>("Failed to upload file", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{eventId}/download_document")
+    public ResponseEntity<byte[]> downloadDocument(@PathVariable Long eventId) throws ResourceNotFoundException {
+
+        EventDto eventDto = eventService.downloadDocument(eventId);
+        byte[] documentData = eventDto.getDocumentData();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(ContentDisposition.builder("attachment").filename("event_document.pdf").build());
+        return new ResponseEntity<>(documentData, headers, HttpStatus.OK);
     }
 
 }

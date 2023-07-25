@@ -31,6 +31,9 @@ public class Event {
     @OneToMany(mappedBy = "event")
     @Column(name = "ticket_list")
     private List<Ticket> ticketList;
+    @Lob
+    @Column(name = "document_data")
+    private byte[] documentData;
 
 
     public Event() {
@@ -105,6 +108,14 @@ public class Event {
 
     public void setTicketList(List<Ticket> ticketList) {
         this.ticketList = ticketList;
+    }
+
+    public byte[] getDocumentData() {
+        return documentData;
+    }
+
+    public void setDocumentData(byte[] documentData) {
+        this.documentData = documentData;
     }
 
     @Override

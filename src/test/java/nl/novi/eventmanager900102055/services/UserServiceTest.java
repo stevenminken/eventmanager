@@ -117,6 +117,7 @@ public class UserServiceTest {
         assertThrows(UsernameNotFoundException.class, () -> userService.findUserByUsername("unknown_user"));
         verify(userRepository, times(1)).findByUsername(anyString());
     }
+
     @Test
     @DisplayName("Check if User Exists with Valid Username Should Return True")
     public void testUserExists_WithValidUsername_ShouldReturnTrue() {
@@ -138,6 +139,7 @@ public class UserServiceTest {
         assertFalse(result);
         verify(userRepository, times(1)).existsById("unknown_user");
     }
+
     @Test
     @DisplayName("Update User Password with Valid Username Should Update Password")
     public void testUpdateUserPassword_WithValidUsername_ShouldUpdatePassword() throws ResourceNotFoundException {
@@ -166,6 +168,7 @@ public class UserServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> userService.updateUserPassword(userDtoToUpdate));
         verify(userRepository, times(1)).findByUsername(anyString());
     }
+
     @Test
     @DisplayName("Delete User with Existing Username Should Delete User")
     public void testDeleteUser_WithExistingUsername_ShouldDeleteUser() {
@@ -187,6 +190,7 @@ public class UserServiceTest {
         verify(userRepository, times(1)).existsById("unknown_user");
         verify(userRepository, times(0)).deleteById(anyString());
     }
+
     @Test
     @DisplayName("Get Authorities for Existing User Should Return Authorities")
     public void testGetAuthorities_WithExistingUser_ShouldReturnAuthorities() throws ResourceNotFoundException {
@@ -277,10 +281,31 @@ public class UserServiceTest {
         verify(userRepository, times(1)).findById(anyString());
         verify(userRepository, times(0)).save(any(User.class));
     }
+
+    @Test
+    @DisplayName("Remove Non-Existing Authority from Existing User Should Throw ResourceNotFoundException")
+    public void testRemoveNonExistingAuthority_WithExistingUser_ShouldThrowResourceNotFoundException() throws ResourceNotFoundException {
+
+        User user = new User();
+        user.setUsername("mara_test");
+        Authority authority1 = new Authority("mara_test", "ROLE_USER");
+        user.addAuthority(authority1);
+
+        when(userRepository.findById("mara_test")).thenReturn(Optional.of(user));
+
+        assertThrows(ResourceNotFoundException.class, () -> userService.removeAuthority("mara_test", "ROLE_ADMIN"));
+
+        Set<Authority> authorities = user.getAuthorities();
+        assertEquals(1, authorities.size());
+        assertTrue(authorities.contains(authority1));
+        verify(userRepository, times(1)).findById("mara_test");
+        verify(userRepository, times(0)).save(any(User.class));
+    }
+
     @Test
     @DisplayName("Transfer User List to UserDto List")
     public void testTransferUserListToUserDtoList() {
-        // Create some users for testing
+
         User user1 = new User();
         user1.setUsername("gerrit_test");
         user1.setEmail("gerrit.test@example.com");
@@ -296,10 +321,8 @@ public class UserServiceTest {
         userList.add(user1);
         userList.add(user2);
 
-        // Perform the transfer
         List<UserDto> userDtoList = userService.transferUserListToUserDtoList(userList);
 
-        // Verify the results
         assertEquals(2, userDtoList.size());
 
         UserDto userDto1 = userDtoList.get(0);
@@ -319,7 +342,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("Transfer UserDto to User")
     public void testTransferUserDtoToUser() {
-        // Create a UserDto for testing
+
         UserDto userDto = new UserDto();
         userDto.setUsername("gerrit_test");
         userDto.setPassword("password");
@@ -327,32 +350,27 @@ public class UserServiceTest {
         userDto.setApikey("apikey123");
         userDto.setEmail("gerrit.test@example.com");
 
-        // Perform the transfer
         User user = userService.transferUserDtoToUser(userDto);
 
-        // Verify the results
         assertEquals("gerrit_test", user.getUsername());
         assertEquals("password", user.getPassword());
         assertTrue(user.isEnabled());
         assertEquals("apikey123", user.getApikey());
         assertEquals("gerrit.test@example.com", user.getEmail());
-//        assertNull(user.getAuthorities()); // Authorities are not transferred in this direction
     }
 
     @Test
     @DisplayName("Transfer User to UserDto")
     public void testTransferUserToUserDto() {
-        // Create a User for testing
+
         User user = new User();
         user.setUsername("gerrit_test");
         user.setEmail("gerrit.test@example.com");
         user.addAuthority(new Authority("gerrit_test", "ROLE_USER"));
         user.addAuthority(new Authority("gerrit_test", "ROLE_ADMIN"));
 
-        // Perform the transfer
         UserDto userDto = userService.transferUserToUserDto(user);
 
-        // Verify the results
         assertEquals("gerrit_test", userDto.getUsername());
         assertEquals("gerrit.test@example.com", userDto.getEmail());
         assertEquals(2, userDto.getAuthorities().size());
@@ -362,6 +380,5 @@ public class UserServiceTest {
         assertNull(userDto.getEnabled()); // Enabled is not transferred in this direction
         assertNull(userDto.getApikey()); // Apikey is not transferred in this direction
     }
-
 
 }

@@ -13,8 +13,11 @@ import nl.novi.eventmanager900102055.repositories.LocationRepository;
 import nl.novi.eventmanager900102055.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -117,6 +120,38 @@ public class EventService {
             return true;
         }
         return false;
+    }
+
+    public EventDto uploadDocument(Long eventId, MultipartFile file) throws ResourceNotFoundException, IOException {
+        Event event = eventRepository.findById(eventId).orElse(null);
+        if (event == null) {
+            throw new ResourceNotFoundException("Event not found");
+        }
+
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("Please select a file to upload");
+        }
+
+        event.setDocumentData(file.getBytes());
+
+        eventRepository.save(event);
+
+        EventDto eventDto = transferEventToEventDto(event);
+        eventDto.setDocumentData(event.getDocumentData());
+
+        return eventDto;
+    }
+
+    public EventDto downloadDocument(Long eventId) throws ResourceNotFoundException {
+        Event event = eventRepository.findById(eventId).orElse(null);
+        if (event == null) {
+            throw new ResourceNotFoundException("Event not found");
+        }
+
+        EventDto eventDto = transferEventToEventDto(event);
+        eventDto.setDocumentData(event.getDocumentData());
+
+        return eventDto;
     }
 
     public List<EventDto> transferEventListToEventDtoList(List<Event> eventList) {

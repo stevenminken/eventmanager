@@ -25,6 +25,7 @@ public class EventDto {
     private List<Artist> artistList;
 
     private List<Ticket> ticketList;
+    private byte[] documentData;
 
     public EventDto() {
     }
@@ -91,5 +92,13 @@ public class EventDto {
 
     public void setArtistList(List<Artist> artistList) {
         this.artistList = artistList;
+    }
+
+    public byte[] getDocumentData() {
+        return documentData;
+    }
+
+    public void setDocumentData(byte[] documentData) {
+        this.documentData = documentData;
     }
 }

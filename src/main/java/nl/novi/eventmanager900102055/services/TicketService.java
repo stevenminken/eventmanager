@@ -24,18 +24,12 @@ public class TicketService {
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
     private final TransactionRepository transactionRepository;
-    private final EventService eventService;
-    private final UserService userService;
-    private final TransactionService transactionService;
 
     public TicketService(TicketRepository ticketRepository, UserRepository userRepository, EventRepository eventRepository, TransactionRepository transactionRepository, EventService eventService, UserService userService, TransactionService transactionService) {
         this.ticketRepository = ticketRepository;
         this.userRepository = userRepository;
         this.eventRepository = eventRepository;
         this.transactionRepository = transactionRepository;
-        this.eventService = eventService;
-        this.userService = userService;
-        this.transactionService = transactionService;
     }
 
     public TicketDto createTicket(Long eventId, String username, Double price) throws ResourceNotFoundException, TicketsSoldOutException {
@@ -147,17 +141,6 @@ public class TicketService {
         }
         return ticketDtoList;
     }
-
-//    public Ticket transferTicketDtoToTicket(TicketDto ticketDto) {
-//        Ticket ticket = new Ticket();
-//        ticket.setId(ticketDto.getId());
-//        ticket.setPrice(ticketDto.getPrice());
-//        ticket.setEvent(ticketDto.getEvent());
-//        ticket.setTransaction(ticketDto.getTransaction());
-//        ticket.setUser(ticketDto.getUser());
-//
-//        return ticket;
-//    }
 
     public TicketDto transferTicketToTicketDto(Ticket ticket) {
         TicketDto ticketDto = new TicketDto();

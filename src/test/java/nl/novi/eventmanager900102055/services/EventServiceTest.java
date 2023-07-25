@@ -18,8 +18,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -170,6 +173,7 @@ class EventServiceTest {
 
         assertThrows(ResourceNotFoundException.class, () -> eventService.findEventByName("Non-existing Event"));
     }
+
     @Test
     @DisplayName("Update Event - With Valid ID, Should Update Event")
     void testUpdateEvent_WithValidId_ShouldUpdateEvent() {
@@ -301,6 +305,7 @@ class EventServiceTest {
 
         assertFalse(added);
     }
+
     @Test
     @DisplayName("Delete Event - With Valid Id, Should Delete Event and Remove from Artists")
     void testDeleteEvent_WithValidId_ShouldDeleteEventAndRemoveFromArtists() {
@@ -354,6 +359,7 @@ class EventServiceTest {
 
         assertFalse(deleted);
     }
+
     @Test
     @DisplayName("Transfer EventDto to Event - Should Convert Dto to Event")
     void testTransferEventDtoToEvent_ShouldConvertDtoToEvent() {
@@ -394,5 +400,88 @@ class EventServiceTest {
         assertEquals(LocalDate.of(2023, 1, 1), eventDto.getDate());
         assertEquals(100, eventDto.getAvailability());
         assertEquals(50, eventDto.getTicketsSold());
+    }
+
+    @Test
+    @DisplayName("Upload Document - With Valid Event ID and File, Should Upload Document")
+    void testUploadDocument_WithValidEventIdAndFile_ShouldUploadDocument() throws ResourceNotFoundException, IOException {
+
+        Long eventId = 1L;
+        byte[] fileData = "Test document content".getBytes();
+        MockMultipartFile file = new MockMultipartFile("file", "test-document.pdf", MediaType.APPLICATION_PDF_VALUE, fileData);
+
+        Event event = new Event();
+        event.setId(eventId);
+        event.setName("Test Event");
+        event.setDate(LocalDate.now());
+        event.setAvailability(100);
+        event.setTicketsSold(0);
+
+        when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
+        when(eventRepository.save(any(Event.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+
+        EventDto eventDto = eventService.uploadDocument(eventId, file);
+
+        assertNotNull(eventDto);
+        assertEquals(eventId, eventDto.getId());
+        assertEquals("Test Event", eventDto.getName());
+        assertEquals(LocalDate.now(), eventDto.getDate());
+        assertEquals(100, eventDto.getAvailability());
+        assertEquals(0, eventDto.getTicketsSold());
+        assertNotNull(eventDto.getDocumentData());
+        assertArrayEquals(fileData, eventDto.getDocumentData());
+    }
+
+    @Test
+    @DisplayName("Upload Document - With Invalid Event ID, Should Throw ResourceNotFoundException")
+    void testUploadDocument_WithInvalidEventId_ShouldThrowResourceNotFoundException() throws ResourceNotFoundException, IOException {
+
+        Long eventId = 1L;
+        MockMultipartFile file = new MockMultipartFile("file", "test-document.pdf", MediaType.APPLICATION_PDF_VALUE, "Test document content".getBytes());
+
+        when(eventRepository.findById(eventId)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> eventService.uploadDocument(eventId, file));
+    }
+
+    @Test
+    @DisplayName("Download Document - With Valid Event ID, Should Download Document")
+    void testDownloadDocument_WithValidEventId_ShouldDownloadDocument() throws ResourceNotFoundException {
+
+        Long eventId = 1L;
+        byte[] documentData = "Test document content".getBytes();
+
+        Event event = new Event();
+        event.setId(eventId);
+        event.setName("Test Event");
+        event.setDate(LocalDate.now());
+        event.setAvailability(100);
+        event.setTicketsSold(0);
+        event.setDocumentData(documentData);
+
+        when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
+
+        EventDto eventDto = eventService.downloadDocument(eventId);
+
+        assertNotNull(eventDto);
+        assertEquals(eventId, eventDto.getId());
+        assertEquals("Test Event", eventDto.getName());
+        assertEquals(LocalDate.now(), eventDto.getDate());
+        assertEquals(100, eventDto.getAvailability());
+        assertEquals(0, eventDto.getTicketsSold());
+        assertNotNull(eventDto.getDocumentData());
+        assertArrayEquals(documentData, eventDto.getDocumentData());
+    }
+
+    @Test
+    @DisplayName("Download Document - With Invalid Event ID, Should Throw ResourceNotFoundException")
+    void testDownloadDocument_WithInvalidEventId_ShouldThrowResourceNotFoundException() throws ResourceNotFoundException {
+
+        Long eventId = 1L;
+
+        when(eventRepository.findById(eventId)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> eventService.downloadDocument(eventId));
     }
 }

@@ -54,20 +54,17 @@ public class SpringSecurityConfig {
                 // Uncomment for developer mode
 //                .requestMatchers("/**").permitAll()
 
-                .requestMatchers(HttpMethod.POST, "/users").permitAll()
                 .requestMatchers("/authenticate").permitAll()
-
-                .requestMatchers("/**").authenticated()
-
+                .requestMatchers("/authenticated").permitAll()
+                .requestMatchers(HttpMethod.GET, "/events/*").hasAnyRole("ADMIN", "USER")
                 .requestMatchers("/artists/**", "/transactions/**", "/locations/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.GET, "/events/find_all_events", "/events/*").hasAnyRole("ADMIN", "USER")
-                .requestMatchers(HttpMethod.GET, "/users/**", "/tickets/**", "/events/**").hasAnyRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/users/**", "/tickets/**", "/events/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/users/create_user", "/tickets/create_ticket", "/tickets/tickets_user", "/events/find_event_by_name").hasAnyRole("ADMIN", "USER")
-                .requestMatchers(HttpMethod.POST, "/users/**", "/tickets/**", "/events/**").hasAnyRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/users/**", "/tickets/**", "/events/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/users/update_user").hasAnyRole("ADMIN", "USER")
                 .requestMatchers(HttpMethod.PUT, "/users/**", "/tickets/**", "/events/**").hasAnyRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/users/delete_user").hasAnyRole("ADMIN", "USER")
-                .requestMatchers(HttpMethod.DELETE, "/users/**", "/tickets/**", "/events/**").hasAnyRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/users/**", "/tickets/**", "/events/**").hasRole("ADMIN")
 
                 .anyRequest().denyAll()
                 .and()

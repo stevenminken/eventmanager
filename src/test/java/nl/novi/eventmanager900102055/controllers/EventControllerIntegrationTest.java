@@ -4,18 +4,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import nl.novi.eventmanager900102055.dtos.EventDto;
 import nl.novi.eventmanager900102055.services.EventService;
+import org.glassfish.jaxb.core.v2.TODO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
@@ -25,11 +30,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 public class EventControllerIntegrationTest {
@@ -65,8 +76,8 @@ public class EventControllerIntegrationTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/events/create_event")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(eventDto)))
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.header().string("Location", "/Events/Test%20Event"))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", "/Events/Test%20Event"))
                 .andExpect(MockMvcResultMatchers.content().string("Event created: Test Event with id: 1"));
     }
 
@@ -86,8 +97,8 @@ public class EventControllerIntegrationTest {
 
         when(eventService.findAllEvents()).thenReturn(eventDtoList);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/events/find_all_events"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+        mockMvc.perform(get("/events/find_all_events"))
+                .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].id").value(eventDto.getId()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].name").value(eventDto.getName()))
@@ -108,8 +119,8 @@ public class EventControllerIntegrationTest {
 
         when(eventService.findEventById(eq(1L))).thenReturn(eventDto);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/events/1"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+        mockMvc.perform(get("/events/1"))
+                .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Test Event"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.date").value("2024-01-01"))
@@ -130,7 +141,7 @@ public class EventControllerIntegrationTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/events/find_event_by_name")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestBody)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Test Event"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.date").value("2024-01-01"))
@@ -155,7 +166,7 @@ public class EventControllerIntegrationTest {
         mockMvc.perform(MockMvcRequestBuilders.put("/events/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(eventDto)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Updated Event"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.date").value("2025-01-01"))
@@ -180,7 +191,7 @@ public class EventControllerIntegrationTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/events/add_location")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestBody)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string("Location added"));
     }
 
@@ -201,7 +212,7 @@ public class EventControllerIntegrationTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/events/add_artist")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestBody)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string("Artist added"));
     }
 
@@ -215,7 +226,32 @@ public class EventControllerIntegrationTest {
         when(eventService.deleteEvent(eq(eventId))).thenReturn(true);
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/events/{id}", eventId))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string("Event deleted"));
     }
+
+    @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
+    public void testUploadDocument() throws Exception {
+
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "test-document.pdf",
+                MediaType.APPLICATION_PDF_VALUE,
+                "Test document content".getBytes()
+        );
+
+        mockMvc.perform(multipart("/events/{eventId}/upload_document", eventDto.getId())
+                        .file(file))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
+    public void testDownloadDocument() throws Exception {
+
+    // Het is niet gelukt deze methode succesvol te implementeren
+
+    }
+
 }
