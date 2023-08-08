@@ -6,18 +6,13 @@ import nl.novi.eventmanager900102055.exceptions.ResourceNotFoundException;
 import nl.novi.eventmanager900102055.models.Artist;
 import nl.novi.eventmanager900102055.models.Event;
 import nl.novi.eventmanager900102055.models.Location;
-import nl.novi.eventmanager900102055.models.User;
 import nl.novi.eventmanager900102055.repositories.ArtistRepository;
 import nl.novi.eventmanager900102055.repositories.EventRepository;
 import nl.novi.eventmanager900102055.repositories.LocationRepository;
-import nl.novi.eventmanager900102055.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 

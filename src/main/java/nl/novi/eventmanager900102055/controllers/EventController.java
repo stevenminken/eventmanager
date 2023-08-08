@@ -1,19 +1,16 @@
 package nl.novi.eventmanager900102055.controllers;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import jakarta.validation.Valid;
 import nl.novi.eventmanager900102055.dtos.EventDto;
-import nl.novi.eventmanager900102055.dtos.TicketDto;
 import nl.novi.eventmanager900102055.exceptions.NameDuplicateException;
 import nl.novi.eventmanager900102055.exceptions.ResourceNotFoundException;
 import nl.novi.eventmanager900102055.services.EventService;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +19,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 

@@ -2,7 +2,6 @@ package nl.novi.eventmanager900102055.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 
 import java.util.ArrayList;
 import java.util.List;

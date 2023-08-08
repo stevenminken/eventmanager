@@ -1,11 +1,9 @@
 package nl.novi.eventmanager900102055.dtos;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import nl.novi.eventmanager900102055.models.Event;
-import nl.novi.eventmanager900102055.models.User;
 
 import java.util.List;
 

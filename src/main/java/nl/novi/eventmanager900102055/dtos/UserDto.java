@@ -1,21 +1,19 @@
 package nl.novi.eventmanager900102055.dtos;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import nl.novi.eventmanager900102055.models.*;
+import nl.novi.eventmanager900102055.models.Authority;
+import nl.novi.eventmanager900102055.models.Ticket;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class UserDto {
 
     @Pattern(regexp = "^[^0-9]+$", message = "Name cannot have digits")
-    @Size(min = 2, message = "username should have at least 2 characters")
+    @Size(min = 2, message = "Username should have at least 2 characters")
     private String username;
     @Size(min = 4, max = 20, message = "Password must be between 4 and 20 characters")
     private String password;

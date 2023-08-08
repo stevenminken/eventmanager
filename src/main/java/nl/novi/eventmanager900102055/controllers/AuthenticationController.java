@@ -2,7 +2,6 @@ package nl.novi.eventmanager900102055.controllers;
 
 import nl.novi.eventmanager900102055.dtos.AuthenticationRequest;
 import nl.novi.eventmanager900102055.dtos.AuthenticationResponse;
-import nl.novi.eventmanager900102055.services.CustomUserDetailsService;
 import nl.novi.eventmanager900102055.utils.JwtUtil;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;

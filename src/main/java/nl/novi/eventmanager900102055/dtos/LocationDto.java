@@ -1,17 +1,15 @@
 package nl.novi.eventmanager900102055.dtos;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import nl.novi.eventmanager900102055.models.Event;
-import nl.novi.eventmanager900102055.models.User;
 
 import java.util.List;
 
 public class LocationDto {
     private Long id;
-    @Size(min = 2, message = "name location should have at least 2 characters")
+    @Size(min = 2, message = "Location name should have at least 2 characters")
     private String name;
 
     private String address;

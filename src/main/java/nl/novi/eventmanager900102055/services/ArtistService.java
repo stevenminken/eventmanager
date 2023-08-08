@@ -4,9 +4,7 @@ import nl.novi.eventmanager900102055.dtos.ArtistDto;
 import nl.novi.eventmanager900102055.exceptions.NameDuplicateException;
 import nl.novi.eventmanager900102055.exceptions.ResourceNotFoundException;
 import nl.novi.eventmanager900102055.models.Artist;
-import nl.novi.eventmanager900102055.models.User;
 import nl.novi.eventmanager900102055.repositories.ArtistRepository;
-import nl.novi.eventmanager900102055.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

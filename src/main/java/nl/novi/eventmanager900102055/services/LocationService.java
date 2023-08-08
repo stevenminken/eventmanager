@@ -15,14 +15,12 @@ import java.util.List;
 @Service
 public class LocationService {
     private final LocationRepository locationRepository;
-    private final UserRepository userRepository;
 
-    public LocationService(LocationRepository locationRepository, UserRepository userRepository) {
+    public LocationService(LocationRepository locationRepository) {
         this.locationRepository = locationRepository;
-        this.userRepository = userRepository;
     }
 
-    public LocationDto createLocation(LocationDto locationDto) throws NameDuplicateException, ResourceNotFoundException {
+    public LocationDto createLocation(LocationDto locationDto) throws NameDuplicateException {
 
         Iterable<Location> locations = locationRepository.findAll();
         for (Location l : locations) {

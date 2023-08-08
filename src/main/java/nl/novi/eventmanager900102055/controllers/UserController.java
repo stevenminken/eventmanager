@@ -1,13 +1,10 @@
 package nl.novi.eventmanager900102055.controllers;
 
 import jakarta.validation.Valid;
-import nl.novi.eventmanager900102055.dtos.LocationDto;
 import nl.novi.eventmanager900102055.dtos.UserDto;
-import nl.novi.eventmanager900102055.exceptions.BadRequestException;
 import nl.novi.eventmanager900102055.exceptions.NameDuplicateException;
 import nl.novi.eventmanager900102055.exceptions.ResourceNotFoundException;
 import nl.novi.eventmanager900102055.models.Authority;
-import nl.novi.eventmanager900102055.models.User;
 import nl.novi.eventmanager900102055.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

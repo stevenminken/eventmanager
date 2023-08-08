@@ -1,10 +1,11 @@
 package nl.novi.eventmanager900102055.dtos;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import nl.novi.eventmanager900102055.models.Artist;
 import nl.novi.eventmanager900102055.models.Location;
 import nl.novi.eventmanager900102055.models.Ticket;
-import nl.novi.eventmanager900102055.models.User;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
